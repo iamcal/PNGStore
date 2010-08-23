@@ -1,0 +1,169 @@
+
+<div id="results"></div>
+
+<script src="md5.js"></script>
+<script>
+
+//
+// General unpacking functions.
+//
+// png_to_string() is the wrapper - it takes a src image,
+// loads it and then calls the unpacker function with an
+// array of the pixels in the image (an ImageData object)
+// really. The unpacker function then turns this into a
+// string which gets passed to the callback.
+//
+
+function png_to_string(src, unpacker, decoder, callback){
+	var o = new Image();
+	o.onload = function() {
+		var c = document.createElement("canvas");
+		var t = c.getContext("2d");
+		var w = o.width;
+		var h = o.height;
+		c.width = w;
+		c.style.width = w;
+		c.height = h;
+		c.style.height = h;
+		t.globalAlpha = 1.0;
+		t.globalCompositeOperation = 'copy';
+		t.drawImage(o, 0, 0);
+		var b = t.getImageData( 0, 0, w, h ).data;
+		callback(decoder(unpacker(b)));
+	}
+	o.src = 'test_images/'+src;
+}
+
+//
+// unpackers take image pixels and turn them into an array of bytes.
+// those bytes will get passed to a decoder to turn them into a string.
+//
+
+function unpack_r(b){
+
+	var s = [];
+	for (var i=0; i<b.length; i += 4){
+		if( b[i] > 0 ) s.push(b[i]);
+	}
+	return s;
+}
+
+function unpack_rgb(b){
+
+	var s = [];
+	for (var i=0; i < b.length; i+=4){
+		if (b[i+0] > 0) s.push(b[i+0]);
+		if (b[i+1] > 0) s.push(b[i+1]);
+		if (b[i+2] > 0) s.push(b[i+2]);
+	}
+	return s;
+}
+
+function unpack_rgba(b){
+
+	var s = [];
+	for (var i= 0; i<b.length; i+=4){
+		if( b[i] > 0 ) s.push(b[i]);
+		if( b[i+1] > 0 ) s.push(b[i+1]);
+		if( b[i+2] > 0 ) s.push(b[i+2]);
+		if( b[i+3] > 0 ) s.push(b[i+3] / 2);
+	}
+	return s;
+}
+
+function decode_ascii(b){
+
+	var s = "";
+	for (var i=0; i<b.length; i++){
+		if (b[i]) s += String.fromCharCode(b[i]);
+	}
+
+	return s;
+}
+
+function decode_seq8(b){
+
+	var s = "";
+	var num = Math.ceil(b.length / 7);
+
+	for (var i=0; i<num; i++){
+
+		var b1 = b[(i*7)+0];
+		var b2 = b[(i*7)+1];
+		var b3 = b[(i*7)+2];
+		var b4 = b[(i*7)+3];
+		var b5 = b[(i*7)+4];
+		var b6 = b[(i*7)+5];
+		var b7 = b[(i*7)+6];
+
+		var c1 = (b1 >>> 1);
+		var c2 = ((b1 << 6) & 0x7e) | (b2 >>> 2);
+		var c3 = ((b2 << 5) & 0x7e) | (b3 >>> 3);
+		var c4 = ((b3 << 4) & 0x7e) | (b4 >>> 4);
+		var c5 = ((b4 << 3) & 0x7e) | (b5 >>> 5);
+		var c6 = ((b5 << 2) & 0x7e) | (b6 >>> 6);
+		var c7 = ((b6 << 1) & 0x7e) | (b7 >>> 7);
+		var c8 = ((b7 << 0) & 0x7e);
+
+		if (c1 > 0) s += String.fromCharCode(c1);
+		if (c2 > 0) s += String.fromCharCode(c2);
+		if (c3 > 0) s += String.fromCharCode(c3);
+		if (c4 > 0) s += String.fromCharCode(c4);
+		if (c5 > 0) s += String.fromCharCode(c5);
+		if (c6 > 0) s += String.fromCharCode(c6);
+		if (c7 > 0) s += String.fromCharCode(c7);
+		if (c8 > 0) s += String.fromCharCode(c8);
+	}
+
+	return s;
+}
+
+
+//png_to_string('24b_wide_c0.png', unpack_rgb, function(s){
+	//alert(s);
+//});
+
+
+//
+// test multiple images...
+//
+
+var image_formats = [
+	['ascii_8b_wide.png',		unpack_r, decode_ascii],
+	['ascii_8b_tall.png',		unpack_r, decode_ascii],
+	['ascii_8b_square.png',		unpack_r, decode_ascii],
+
+	['ascii_24b_wide.png',		unpack_rgb, decode_ascii],
+	['ascii_24b_tall.png',		unpack_rgb, decode_ascii],
+	['ascii_24b_square.png',	unpack_rgb, decode_ascii],
+
+//	['ascii_32b_wide.png',		unpack_rgba, decode_ascii],
+//	['ascii_32b_tall.png',		unpack_rgba, decode_ascii],
+//	['ascii_32b_square.png',	unpack_rgba, decode_ascii],
+
+//	['seq8_8b_wide.png',		unpack_r, decode_seq8],
+//	['seq8_8b_tall.png',		unpack_r, decode_seq8],
+//	['seq8_8b_square.png',		unpack_r, decode_seq8],
+
+	['seq8_24b_wide.png',		unpack_rgb, decode_seq8],
+	['seq8_24b_tall.png',		unpack_rgb, decode_seq8],
+	['seq8_24b_square.png',		unpack_rgb, decode_seq8],
+
+];
+
+for (var i=0; i<image_formats.length; i++){
+	var a = image_formats[i];
+	png_to_string(a[0], a[1], a[2], function(){
+		var x = a[0];	
+		return function(s){
+			var z = x;
+			var e = document.createElement('div');
+			e.innerHTML = z + ' : ' + hex_md5(s) + " : " + s.substr(0, 10) + " : " + s.length;
+			document.getElementById('results').appendChild(e);
+		}
+	}());
+}
+
+
+
+</script>
