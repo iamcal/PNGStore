@@ -1,5 +1,5 @@
 
-<div id="results"></div>
+<table border="1"><tbody id="results"></tbody></table>
 
 <script src="md5.js"></script>
 <script>
@@ -83,6 +83,8 @@ function decode_ascii(b){
 
 function decode_seq8(b){
 
+//console.log(b);
+
 	var s = "";
 	var num = Math.ceil(b.length / 7);
 
@@ -97,13 +99,13 @@ function decode_seq8(b){
 		var b7 = b[(i*7)+6];
 
 		var c1 = (b1 >>> 1);
-		var c2 = ((b1 << 6) & 0x7e) | (b2 >>> 2);
-		var c3 = ((b2 << 5) & 0x7e) | (b3 >>> 3);
-		var c4 = ((b3 << 4) & 0x7e) | (b4 >>> 4);
-		var c5 = ((b4 << 3) & 0x7e) | (b5 >>> 5);
-		var c6 = ((b5 << 2) & 0x7e) | (b6 >>> 6);
-		var c7 = ((b6 << 1) & 0x7e) | (b7 >>> 7);
-		var c8 = ((b7 << 0) & 0x7e);
+		var c2 = ((b1 << 6) & 0x7f) | (b2 >>> 2);
+		var c3 = ((b2 << 5) & 0x7f) | (b3 >>> 3);
+		var c4 = ((b3 << 4) & 0x7f) | (b4 >>> 4);
+		var c5 = ((b4 << 3) & 0x7f) | (b5 >>> 5);
+		var c6 = ((b5 << 2) & 0x7f) | (b6 >>> 6);
+		var c7 = ((b6 << 1) & 0x7f) | (b7 >>> 7);
+		var c8 = (b7 & 0x7f);
 
 		if (c1 > 0) s += String.fromCharCode(c1);
 		if (c2 > 0) s += String.fromCharCode(c2);
@@ -117,11 +119,6 @@ function decode_seq8(b){
 
 	return s;
 }
-
-
-//png_to_string('24b_wide_c0.png', unpack_rgb, function(s){
-	//alert(s);
-//});
 
 
 //
@@ -141,9 +138,9 @@ var image_formats = [
 //	['ascii_32b_tall.png',		unpack_rgba, decode_ascii],
 //	['ascii_32b_square.png',	unpack_rgba, decode_ascii],
 
-//	['seq8_8b_wide.png',		unpack_r, decode_seq8],
-//	['seq8_8b_tall.png',		unpack_r, decode_seq8],
-//	['seq8_8b_square.png',		unpack_r, decode_seq8],
+	['seq8_8b_wide.png',		unpack_r, decode_seq8],
+	['seq8_8b_tall.png',		unpack_r, decode_seq8],
+	['seq8_8b_square.png',		unpack_r, decode_seq8],
 
 	['seq8_24b_wide.png',		unpack_rgb, decode_seq8],
 	['seq8_24b_tall.png',		unpack_rgb, decode_seq8],
@@ -151,15 +148,39 @@ var image_formats = [
 
 ];
 
+var elm_map = {};
+var html = "";
+var start_snip = 16;
+var end_snip = 5;
+
+for (var i=0; i<image_formats.length; i++){
+	var a = image_formats[i];
+	var id = "cell"+i;
+	elm_map[a[0]] = id;
+
+	html += "<tr>";
+	html += "<td id=\""+id+"_a\"></td>";
+	html += "<td id=\""+id+"_b\"></td>";
+	html += "<td id=\""+id+"_c\"></td>";
+	html += "<td id=\""+id+"_d\"></td>";
+	html += "<td id=\""+id+"_e\"></td>";
+	html += "</tr>";
+}
+document.getElementById('results').innerHTML = html;
+
+
+
 for (var i=0; i<image_formats.length; i++){
 	var a = image_formats[i];
 	png_to_string(a[0], a[1], a[2], function(){
 		var x = a[0];	
 		return function(s){
 			var z = x;
-			var e = document.createElement('div');
-			e.innerHTML = z + ' : ' + hex_md5(s) + " : " + s.substr(0, 10) + " : " + s.length;
-			document.getElementById('results').appendChild(e);
+			document.getElementById(elm_map[z]+'_a').innerHTML = z;
+			document.getElementById(elm_map[z]+'_b').innerHTML = hex_md5(s);
+			document.getElementById(elm_map[z]+'_c').innerHTML = s.substr(0, start_snip);
+			document.getElementById(elm_map[z]+'_d').innerHTML = s.substr(s.length-(end_snip+1), end_snip);
+			document.getElementById(elm_map[z]+'_e').innerHTML = s.length;
 		}
 	}());
 }
