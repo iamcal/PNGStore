@@ -3,64 +3,74 @@
 
 	$GLOBALS[path] = 'test_images/';
 
-	$data = file_get_contents('lipsum.txt');
-	$size = strlen($data);
 
-	echo "Input size is $size\n";
+
+	encode_file('lipsum.txt', 'lipsum');
+	encode_file('jquery-1.4.2.min.js', 'jquery');
+
 
 	####################################################################################################
 
-	#
-	# the simplest method is to store the bytes as they are in ascii.
-	# this is the least space-efficient.
-	#
+	function encode_file($path, $prefix){
 
-	$bytes = array();
-	for ($i=0; $i<strlen($data); $i++){
-		$bytes[] = ord(substr($data, $i, 1));
+		$data = file_get_contents($path);
+		$size = strlen($data);
+
+		echo "$path is $size bytes\n";
+
+
+		#
+		# the simplest method is to store the bytes as they are in ascii.
+		# this is the least space-efficient.
+		#
+
+		$bytes = array();
+		for ($i=0; $i<strlen($data); $i++){
+			$bytes[] = ord(substr($data, $i, 1));
+		}
+
+		store_bytes($bytes, $prefix.'_ascii');
+
+
+		#
+		# next simplest is to store values using 7 bits, so we store 8
+		# characters in every 7 bytes
+		#
+		# 11111112 22222233 33333444 44445555 55566666 66777777 78888888
+		#
+
+		$bytes = array();
+		$seqs = ceil(strlen($data) / 8);
+		for ($i=0; $i<$seqs; $i++){
+
+			$c1 = ord(substr($data, ($i*8)+0, 1));
+			$c2 = ord(substr($data, ($i*8)+1, 1));
+			$c3 = ord(substr($data, ($i*8)+2, 1));
+			$c4 = ord(substr($data, ($i*8)+3, 1));
+			$c5 = ord(substr($data, ($i*8)+4, 1));
+			$c6 = ord(substr($data, ($i*8)+5, 1));
+			$c7 = ord(substr($data, ($i*8)+6, 1));
+			$c8 = ord(substr($data, ($i*8)+7, 1));
+
+			$b1 = (($c1 << 1) | ($c2 >> 6)) & 0xff;
+			$b2 = (($c2 << 2) | ($c3 >> 5)) & 0xff;
+			$b3 = (($c3 << 3) | ($c4 >> 4)) & 0xff;
+			$b4 = (($c4 << 4) | ($c5 >> 3)) & 0xff;
+			$b5 = (($c5 << 5) | ($c6 >> 2)) & 0xff;
+			$b6 = (($c6 << 6) | ($c7 >> 1)) & 0xff;
+			$b7 = ((($c7 << 7) & 0x80) | ($c8 & 0x7f)) & 0xff;
+
+			$bytes[] = $b1;
+			$bytes[] = $b2;
+				$bytes[] = $b3;
+			$bytes[] = $b4;
+			$bytes[] = $b5;
+			$bytes[] = $b6;
+			$bytes[] = $b7;
+		}
+
+		store_bytes($bytes, $prefix.'_seq8');
 	}
-
-	store_bytes($bytes, 'ascii');
-
-
-	#
-	# next simplest is to store values using 7 bits, so we store 8
-	# characters in every 7 bytes
-	#
-	# 11111112 22222233 33333444 44445555 55566666 66777777 78888888
-	#
-
-	$bytes = array();
-	$seqs = ceil(strlen($data) / 8);
-	for ($i=0; $i<$seqs; $i++){
-
-		$c1 = ord(substr($data, ($i*8)+0, 1));
-		$c2 = ord(substr($data, ($i*8)+1, 1));
-		$c3 = ord(substr($data, ($i*8)+2, 1));
-		$c4 = ord(substr($data, ($i*8)+3, 1));
-		$c5 = ord(substr($data, ($i*8)+4, 1));
-		$c6 = ord(substr($data, ($i*8)+5, 1));
-		$c7 = ord(substr($data, ($i*8)+6, 1));
-		$c8 = ord(substr($data, ($i*8)+7, 1));
-
-		$b1 = (($c1 << 1) | ($c2 >> 6)) & 0xff;
-		$b2 = (($c2 << 2) | ($c3 >> 5)) & 0xff;
-		$b3 = (($c3 << 3) | ($c4 >> 4)) & 0xff;
-		$b4 = (($c4 << 4) | ($c5 >> 3)) & 0xff;
-		$b5 = (($c5 << 5) | ($c6 >> 2)) & 0xff;
-		$b6 = (($c6 << 6) | ($c7 >> 1)) & 0xff;
-		$b7 = ((($c7 << 7) & 0x80) | ($c8 & 0x7f)) & 0xff;
-
-		$bytes[] = $b1;
-		$bytes[] = $b2;
-		$bytes[] = $b3;
-		$bytes[] = $b4;
-		$bytes[] = $b5;
-		$bytes[] = $b6;
-		$bytes[] = $b7;
-	}
-
-	store_bytes($bytes, 'seq8');
 
 	####################################################################################################
 
