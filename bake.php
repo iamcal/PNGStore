@@ -2,6 +2,7 @@
 	header('Content-type: text/plain');
 
 	$GLOBALS[path] = 'test_images/';
+	$GLOBALS[filter_path] = 'filtered_images/';
 
 
 
@@ -145,7 +146,7 @@
 		}
 		}
 
-		imagepng($im, $GLOBALS[path]."{$mode}_8b_{$shape}.png", 9);
+		save_png($im, "{$mode}_8b_{$shape}");
 		imagedestroy($im);
 	}
 
@@ -173,7 +174,7 @@
 		}
 		}
 
-		imagepng($im, $GLOBALS[path]."{$mode}_24b_{$shape}.png", 9);
+		save_png($im, "{$mode}_24b_{$shape}");
 		imagedestroy($im);
 	}
 
@@ -204,9 +205,35 @@
 		}
 		}
 
-		imagepng($im, $GLOBALS[path]."{$mode}_32b_{$shape}.png", 9);
+		save_png($im, "{$mode}_32b_{$shape}");
 		imagedestroy($im);		
 	}
 
 	####################################################################################################
+
+	function save_png($im, $name){
+
+		for ($a=0; $a<2; $a++){
+		for ($b=0; $b<2; $b++){
+		for ($c=0; $c<2; $c++){
+		for ($d=0; $d<2; $d++){
+
+			$filter = 0;
+			$bits = '';
+			if ($a){ $filter |= PNG_FILTER_SUB;   $bits .= '_sub'; }
+			if ($b){ $filter |= PNG_FILTER_UP;    $bits .= '_up'; }
+			if ($c){ $filter |= PNG_FILTER_AVG;   $bits .= '_avg'; }
+			if ($d){ $filter |= PNG_FILTER_PAETH; $bits .= '_paeth'; }
+
+			if ($filter){
+				imagepng($im, $GLOBALS[filter_path]."{$name}{$bits}.png", 9, $filter);
+			}else{
+				imagepng($im, $GLOBALS[path]."{$name}.png", 9, $filter);
+			}
+		}
+		}
+		}
+		}
+	}
+
 ?>
