@@ -1,0 +1,24 @@
+jQuery Library
+==============
+
+Raw					71,807
+GZipped					24,281
+
+
+Mode			Dimensions	Size	Smushed
+-----------------	---------	------	-------
+ASCII 8bit Wide		71807 x 1	25,195	   -
+ASCII 8bit Tall		1 x 71807	29,838	   -
+ASCII 8bit Square	267 x 269	25,826	   -
+
+ASCII 24bit Wide	23936 x 1	42,615	 24,487
+ASCII 24bit Tall	1 x 23936	56,433	 34,670
+ASCII 24bit Square	154 x 156	64,588	 24,847
+
+ASCII 32bit Wide	17952 x 1	55,897	 34,149
+ASCII 32bit Tall	1 x 17952	62,415	 36,666
+ASCII 32bit Square	133 x 135	67,974	 34,482
+
+Seq8 8bit Wide		62732 x 1	42,923	 42,335
+Seq8 8bit Tall		1 x 62732	52,529	 52,392
+Seq8 8bit Square	250 x 252	43,517	 42,863
