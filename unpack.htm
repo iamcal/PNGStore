@@ -1,3 +1,8 @@
+<p>
+	<a href="#" onclick="test('lipsum'); return false">Test Lorem-Ipsum</a>
+	|
+	<a href="#" onclick="test('jquery'); return false">Test jQuery</a>
+</p>
 
 <table border="1"><tbody id="results"></tbody></table>
 
@@ -30,6 +35,9 @@ function png_to_string(src, unpacker, decoder, callback){
 		t.drawImage(o, 0, 0);
 		var b = t.getImageData( 0, 0, w, h ).data;
 		callback(decoder(unpacker(b)));
+	}
+	o.onerror = function(){
+		callback('ERROR');
 	}
 	o.src = 'test_images/'+src;
 }
@@ -126,68 +134,107 @@ function decode_seq8(b){
 //
 
 var image_formats = [
-	['ascii_8b_wide.png',		unpack_r, decode_ascii],
-	['ascii_8b_tall.png',		unpack_r, decode_ascii],
-	['ascii_8b_square.png',		unpack_r, decode_ascii],
+	['jquery_ascii_8b_wide.png',		unpack_r, decode_ascii],
+	['jquery_ascii_8b_tall.png',		unpack_r, decode_ascii],
+	['jquery_ascii_8b_square.png',		unpack_r, decode_ascii],
 
-	['ascii_24b_wide.png',		unpack_rgb, decode_ascii],
-	['ascii_24b_tall.png',		unpack_rgb, decode_ascii],
-	['ascii_24b_square.png',	unpack_rgb, decode_ascii],
+	['jquery_ascii_24b_wide.png',		unpack_rgb, decode_ascii],
+	['jquery_ascii_24b_tall.png',		unpack_rgb, decode_ascii],
+	['jquery_ascii_24b_square.png',		unpack_rgb, decode_ascii],
 
-	['ascii_32b_wide.png',		unpack_rgba, decode_ascii],
-	['ascii_32b_tall.png',		unpack_rgba, decode_ascii],
-	['ascii_32b_square.png',	unpack_rgba, decode_ascii],
+	['jquery_ascii_32b_wide.png',		unpack_rgba, decode_ascii],
+	['jquery_ascii_32b_tall.png',		unpack_rgba, decode_ascii],
+	['jquery_ascii_32b_square.png',		unpack_rgba, decode_ascii],
 
-	['seq8_8b_wide.png',		unpack_r, decode_seq8],
-	['seq8_8b_tall.png',		unpack_r, decode_seq8],
-	['seq8_8b_square.png',		unpack_r, decode_seq8],
+	['jquery_seq8_8b_wide.png',		unpack_r, decode_seq8],
+	['jquery_seq8_8b_tall.png',		unpack_r, decode_seq8],
+	['jquery_seq8_8b_square.png',		unpack_r, decode_seq8],
 
-	['seq8_24b_wide.png',		unpack_rgb, decode_seq8],
-	['seq8_24b_tall.png',		unpack_rgb, decode_seq8],
-	['seq8_24b_square.png',		unpack_rgb, decode_seq8],
+	['jquery_seq8_24b_wide.png',		unpack_rgb, decode_seq8],
+	['jquery_seq8_24b_tall.png',		unpack_rgb, decode_seq8],
+	['jquery_seq8_24b_square.png',		unpack_rgb, decode_seq8],
 
-	['seq8_32b_wide.png',		unpack_rgba, decode_seq8],
-	['seq8_32b_tall.png',		unpack_rgba, decode_seq8],
-	['seq8_32b_square.png',		unpack_rgba, decode_seq8],
+	['jquery_seq8_32b_wide.png',		unpack_rgba, decode_seq8],
+	['jquery_seq8_32b_tall.png',		unpack_rgba, decode_seq8],
+	['jquery_seq8_32b_square.png',		unpack_rgba, decode_seq8],
+
+	///////////////
+
+	['lipsum_ascii_8b_wide.png',		unpack_r, decode_ascii],
+	['lipsum_ascii_8b_tall.png',		unpack_r, decode_ascii],
+	['lipsum_ascii_8b_square.png',		unpack_r, decode_ascii],
+
+	['lipsum_ascii_24b_wide.png',		unpack_rgb, decode_ascii],
+	['lipsum_ascii_24b_tall.png',		unpack_rgb, decode_ascii],
+	['lipsum_ascii_24b_square.png',		unpack_rgb, decode_ascii],
+
+	['lipsum_ascii_32b_wide.png',		unpack_rgba, decode_ascii],
+	['lipsum_ascii_32b_tall.png',		unpack_rgba, decode_ascii],
+	['lipsum_ascii_32b_square.png',		unpack_rgba, decode_ascii],
+
+	['lipsum_seq8_8b_wide.png',		unpack_r, decode_seq8],
+	['lipsum_seq8_8b_tall.png',		unpack_r, decode_seq8],
+	['lipsum_seq8_8b_square.png',		unpack_r, decode_seq8],
+
+	['lipsum_seq8_24b_wide.png',		unpack_rgb, decode_seq8],
+	['lipsum_seq8_24b_tall.png',		unpack_rgb, decode_seq8],
+	['lipsum_seq8_24b_square.png',		unpack_rgb, decode_seq8],
+
+	['lipsum_seq8_32b_wide.png',		unpack_rgba, decode_seq8],
+	['lipsum_seq8_32b_tall.png',		unpack_rgba, decode_seq8],
+	['lipsum_seq8_32b_square.png',		unpack_rgba, decode_seq8],
 ];
 
 var elm_map = {};
-var html = "";
 var start_snip = 16;
 var end_snip = 5;
+var gi = 1;
 
-for (var i=0; i<image_formats.length; i++){
-	var a = image_formats[i];
-	var id = "cell"+i;
-	elm_map[a[0]] = id;
+function test(prefix){
 
-	html += "<tr>";
-	html += "<td id=\""+id+"_a\"></td>";
-	html += "<td id=\""+id+"_b\"></td>";
-	html += "<td id=\""+id+"_c\"></td>";
-	html += "<td id=\""+id+"_d\"></td>";
-	html += "<td id=\""+id+"_e\"></td>";
-	html += "</tr>";
-}
-document.getElementById('results').innerHTML = html;
+	var html = "";
 
+	for (var i=0; i<image_formats.length; i++){
+		var a = image_formats[i];
 
+		if (a[0].substr(0, prefix.length) != prefix){
 
-for (var i=0; i<image_formats.length; i++){
-	var a = image_formats[i];
-	png_to_string(a[0], a[1], a[2], function(){
-		var x = a[0];	
-		return function(s){
-			var z = x;
-			document.getElementById(elm_map[z]+'_a').innerHTML = z;
-			document.getElementById(elm_map[z]+'_b').innerHTML = hex_md5(s);
-			document.getElementById(elm_map[z]+'_c').innerHTML = s.substr(0, start_snip);
-			document.getElementById(elm_map[z]+'_d').innerHTML = s.substr(s.length-(end_snip+1), end_snip);
-			document.getElementById(elm_map[z]+'_e').innerHTML = s.length;
+			continue;
 		}
-	}());
-}
 
+		var id = "cell"+(gi++);
+		elm_map[a[0]] = id;
+
+		html += "<tr>";
+		html += "<td id=\""+id+"_a\"></td>";
+		html += "<td id=\""+id+"_b\"></td>";
+		html += "<td id=\""+id+"_c\"></td>";
+		html += "<td id=\""+id+"_d\"></td>";
+		html += "<td id=\""+id+"_e\"></td>";
+		html += "</tr>";
+	}
+	document.getElementById('results').innerHTML = html;
+
+
+	for (var i=0; i<image_formats.length; i++){
+		var a = image_formats[i];
+
+		if (a[0].substr(0, prefix.length) != prefix) continue;
+
+		png_to_string(a[0], a[1], a[2], function(){
+			var x = a[0];	
+			return function(s){
+				var z = x;
+				document.getElementById(elm_map[z]+'_a').innerHTML = z;
+				document.getElementById(elm_map[z]+'_b').innerHTML = hex_md5(s);
+				document.getElementById(elm_map[z]+'_c').innerHTML = s.substr(0, start_snip);
+				document.getElementById(elm_map[z]+'_d').innerHTML = s.substr(s.length-(end_snip+1), end_snip);
+				document.getElementById(elm_map[z]+'_e').innerHTML = s.length;
+			}
+		}());
+	}
+
+}
 
 
 </script>
