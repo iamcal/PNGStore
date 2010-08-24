@@ -42,6 +42,47 @@ sub encode_file {
 	}
 
 	&store_bytes($bytes, $prefix.'_ascii');
+
+
+	#
+	# next simplest is to store values using 7 bits, so we store 8
+	# characters in every 7 bytes
+	#
+	# 11111112 22222233 33333444 44445555 55566666 66777777 78888888
+	#
+
+	$bytes = [];
+	my $seqs = ceil($size / 8);
+
+	for my $i(0..$seqs-1){
+
+		my $c1 = ord(substr($data, ($i*8)+0, 1));
+		my $c2 = ord(substr($data, ($i*8)+1, 1));
+		my $c3 = ord(substr($data, ($i*8)+2, 1));
+		my $c4 = ord(substr($data, ($i*8)+3, 1));
+		my $c5 = ord(substr($data, ($i*8)+4, 1));
+		my $c6 = ord(substr($data, ($i*8)+5, 1));
+		my $c7 = ord(substr($data, ($i*8)+6, 1));
+		my $c8 = ord(substr($data, ($i*8)+7, 1));
+
+		my $b1 = (($c1 << 1) | ($c2 >> 6)) & 0xff;
+		my $b2 = (($c2 << 2) | ($c3 >> 5)) & 0xff;
+		my $b3 = (($c3 << 3) | ($c4 >> 4)) & 0xff;
+		my $b4 = (($c4 << 4) | ($c5 >> 3)) & 0xff;
+		my $b5 = (($c5 << 5) | ($c6 >> 2)) & 0xff;
+		my $b6 = (($c6 << 6) | ($c7 >> 1)) & 0xff;
+		my $b7 = ((($c7 << 7) & 0x80) | ($c8 & 0x7f)) & 0xff;
+
+		push @{$bytes}, $b1;
+		push @{$bytes}, $b2;
+		push @{$bytes}, $b3;
+		push @{$bytes}, $b4;
+		push @{$bytes}, $b5;
+		push @{$bytes}, $b6;
+		push @{$bytes}, $b7;
+	}
+
+	&store_bytes($bytes, $prefix.'_seq8');
 }
 
 sub store_bytes {
