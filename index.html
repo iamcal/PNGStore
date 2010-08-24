@@ -6,26 +6,88 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
 	<title>iamcal/PNGStore @ GitHub</title>
-	
-	<style type="text/css">
-		body {
-  		margin-top: 1.0em;
-  		background-color: #40ba01;
-		  font-family: "Helvetica,Arial,FreeSans";
-  		color: #ffffff;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-		h1 { font-size: 3.8em; color: #bf45fe; margin-bottom: 3px; }
-		h1 .small { font-size: 0.4em; }
-		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #bf45fe; }
-    h3 { text-align: center; color: #bf45fe; }
-    a { color: #bf45fe; }
+
+<style type="text/css">
+
+body {
+	color: #000000;
+	background-color: #ffffff;
+	margin: 0;
+	padding: 0;
+	font-family: georgia, helvetica, times new roman, serif;
+	line-height: 1.5em;
+	text-align: center;
+}
+
+#container {
+	text-align: left;
+	margin: 10px auto 40px auto;
+	padding: 10px;
+	max-width: 800px;
+}
+
+a:link {
+	x-text-decoration: none;
+	font-weight: bold;
+	color: #cc0000;
+}
+
+a:visited {
+	x-text-decoration: none;
+	font-weight: bold;
+	color:#666666;
+}
+
+a:hover {
+	text-decoration: underline;
+	font-weight: bold;
+	color:#ff3300;
+}
+
+pre {
+	font-family: monospace;
+	line-height: 1em;
+	border: 1px solid #000000;
+	background-color: #eeeeee;
+	padding: 10px;
+	width: 100%;
+}
+
+blockquote {
+	background-color: #eeeeee;
+	padding: 10px;
+	display: block;
+	margin: 1em 40px;
+}
+
+h1, h2, h3, h4, h5 {
+	font-weight: normal;
+	font-family: verdana, arial, helvetica, sans-serif;
+	padding: 10px 0px 0px 0px;
+	margin:0px;
+}
+
+h1 {
+	line-height: 1.5em;
+}
+
+table {
+	margin: 1em 0;
+}
+
+td, th {
+	xborder: 1px solid #999;
+	padding: 4px;
+	font-size: 12px;
+	line-height: 12px;
+	font-family: arial, helvetica, sans-serif;
+	background-color: #eee;
+}
+
+
+
+
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
 		pre { background: #000; color: #fff; padding: 15px;}
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
     .footer { text-align:center; padding-top:30px; font-style: italic; }
@@ -38,13 +100,6 @@
 
   <div id="container">
 
-    <div class="download">
-      <a href="http://github.com/iamcal/PNGStore/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/iamcal/PNGStore/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
-
     <h1><a href="http://github.com/iamcal/PNGStore">PNGStore</a>
       <span class="small">by <a href="http://github.com/iamcal">iamcal</a></span></h1>
 
@@ -52,26 +107,757 @@
       Store JS/CSS in compressed PNGs
     </div>
 
-    <h2>Authors</h2>
-<p>Cal Henderson (cal@iamcal.com)<br/><br/>      </p>
-<h2>Contact</h2>
-<p>Cal Henderson (cal@iamcal.com)<br/>      </p>
+	<p>Stop! Read the <a href="http://www.iamcal.com/png-store/">original article</a> first!</p>
+
+	<p>
+		Further to previously posted results, I have managed to generate PNGs in nearly all
+		formats. Like many technologies, PNGs seem to be barely understood; there are 5 types 
+		and 14 subtypes, not just PNG8 and PNG24! This round of tests tries to cover them all, 
+		aside from the 16-bit variants (since canvas only returns 8-bit data).
+	</p>
+
+<table border="0" cellpadding="0" cellspacing="1">
+	<tr>
+		<th colspan="2">Type</th>
+		<th>Channels</th>
+		<th>Bits per Channel</th>
+		<th>Bit Depth</th>
+	</tr>
+	<tr><td>0</td><td>Greyscale</td><td>1</td><td>1/2/4/8</td><td>1/2/4/8</td></tr>
+	<tr><td>2</td><td>Truecolor</td><td>3</td><td>8/16</td><td>24/48</td></tr>
+	<tr><td>3</td><td>Indexed</td><td>1</td><td>1/2/4/8</td><td>1/2/4/8</td></tr>
+	<tr><td>4</td><td>Greyscale w/ Alpha</td><td>2</td><td>8/16</td><td>16/32</td></tr>
+	<tr><td>6</td><td>Truecolor w/ Alpha</td><td>4</td><td>8/16</td><td>32/64</td></tr>
+</table>
+
+	<p>These work to varying degrees - be sure to read the notes after the main results.</p>
+
+	<p>
+		Additionally, I have run all images though pngcrush, OptiPNG and PNGOUT 
+		(all with max settings) to see it it makes much of a difference. It does. There are some significant
+		savings to be had.
+	</p>
+
+<h2>Full Results</h2>
+
+<table border="0" cellpadding="0" cellspacing="1">
+	<tr>
+		<th>File</th>
+		<th>Dimensions</th>
+		<th>Type</th>
+		<th>ImageMagick</th>
+		<th>pngcrush</th>
+		<th>OptiPNG</th>
+		<th>PNGOUT</th>
+		<th>Savings over GZip</th>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t0_1b_square.png</td>
+		<td align="center">757 x 759</td>
+		<td>Type 0, 1 bit</td>
+		<td align="right">46,024</td>
+		<td align="right">46,024</td>
+		<td align="right">45,203</td>
+		<td align="right" style="background-color: #cfc">44,789</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t0_1b_tall.png</td>
+		<td align="center">9 x 63830</td>
+		<td>Type 0, 1 bit</td>
+		<td align="right">60,517</td>
+		<td align="right">58,626</td>
+		<td align="right">58,698</td>
+		<td align="right" style="background-color: #cfc">56,385</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t0_1b_wide.png</td>
+		<td align="center">63830 x 9</td>
+		<td>Type 0, 1 bit</td>
+		<td align="right">31,915</td>
+		<td align="right">31,815</td>
+		<td align="right">30,616</td>
+		<td align="right" style="background-color: #cfc">28,898</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t0_2b_square.png</td>
+		<td align="center">535 x 537</td>
+		<td>Type 0, 2 bit</td>
+		<td align="right">39,225</td>
+		<td align="right">39,225</td>
+		<td align="right">38,739</td>
+		<td align="right" style="background-color: #cfc">38,169</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t0_2b_tall.png</td>
+		<td align="center">5 x 57447</td>
+		<td>Type 0, 2 bit</td>
+		<td align="right">51,587</td>
+		<td align="right">50,011</td>
+		<td align="right">50,119</td>
+		<td align="right" style="background-color: #cfc">47,868</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t0_2b_wide.png</td>
+		<td align="center">57447 x 5</td>
+		<td>Type 0, 2 bit</td>
+		<td align="right">30,756</td>
+		<td align="right">30,756</td>
+		<td align="right">28,898</td>
+		<td align="right" style="background-color: #cfc">27,823</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t0_4b_square.png</td>
+		<td align="center">378 x 380</td>
+		<td>Type 0, 4 bit</td>
+		<td align="right">25,464</td>
+		<td align="right">25,353</td>
+		<td align="right">25,464</td>
+		<td align="right" style="background-color: #cfc">24,680</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t0_4b_tall.png</td>
+		<td align="center">3 x 47872</td>
+		<td>Type 0, 4 bit</td>
+		<td align="right">41,558</td>
+		<td align="right">41,236</td>
+		<td align="right">41,351</td>
+		<td align="right" style="background-color: #cfc">39,585</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t0_4b_wide.png</td>
+		<td align="center">47872 x 3</td>
+		<td>Type 0, 4 bit</td>
+		<td align="right">24,575</td>
+		<td align="right">24,470</td>
+		<td align="right">24,575</td>
+		<td align="right" style="background-color: #0f0">23,780</td>
+		<td align="center" style="background-color: #0f0">501</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t0_8b_square.png</td>
+		<td align="center">267 x 269</td>
+		<td>Type 0, 8 bit</td>
+		<td align="right">25,156</td>
+		<td align="right">25,052</td>
+		<td align="right">25,156</td>
+		<td align="right" style="background-color: #cfc">24,584</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t0_8b_tall.png</td>
+		<td align="center">2 x 35904</td>
+		<td>Type 0, 8 bit</td>
+		<td align="right">32,438</td>
+		<td align="right">32,331</td>
+		<td align="right">32,438</td>
+		<td align="right" style="background-color: #cfc">31,361</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t0_8b_wide.png</td>
+		<td align="center">35904 x 2</td>
+		<td>Type 0, 8 bit</td>
+		<td align="right">24,540</td>
+		<td align="right">24,437</td>
+		<td align="right">24,540</td>
+		<td align="right" style="background-color: #0f0">23,975</td>
+		<td align="center" style="background-color: #0f0">306</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t2_8b_square.png</td>
+		<td align="center">154 x 156</td>
+		<td>Type 2, 8 bit</td>
+		<td align="right">64,541</td>
+		<td align="right">24,799</td>
+		<td align="right">24,977</td>
+		<td align="right" style="background-color: #0f0">24,074</td>
+		<td align="center" style="background-color: #0f0">207</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t2_8b_tall.png</td>
+		<td align="center">1 x 23936</td>
+		<td>Type 2, 8 bit</td>
+		<td align="right">56,410</td>
+		<td align="right" style="background-color: #cfc">34,592</td>
+		<td align="right">34,704</td>
+		<td align="right">36,321</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t2_8b_wide.png</td>
+		<td align="center">23936 x 1</td>
+		<td>Type 2, 8 bit</td>
+		<td align="right">42,674</td>
+		<td align="right" style="background-color: #cfc">24,435</td>
+		<td align="right">24,619</td>
+		<td align="right">0</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t3_1b_square.png</td>
+		<td align="center">757 x 759</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">56,860</td>
+		<td align="right" style="background-color: #cfc">40,781</td>
+		<td align="right">45,220</td>
+		<td align="right">44,789</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t3_1b_tall.png</td>
+		<td align="center">9 x 63830</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">86,450</td>
+		<td align="right">66,646</td>
+		<td align="right">58,715</td>
+		<td align="right" style="background-color: #cfc">56,385</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t3_1b_wide.png</td>
+		<td align="center">63830 x 9</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">55,528</td>
+		<td align="right">39,133</td>
+		<td align="right">30,633</td>
+		<td align="right" style="background-color: #cfc">28,898</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t3_2b_square.png</td>
+		<td align="center">535 x 537</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">37,424</td>
+		<td align="right" style="background-color: #cfc">34,624</td>
+		<td align="right">37,412</td>
+		<td align="right">37,424</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t3_2b_tall.png</td>
+		<td align="center">5 x 57447</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">59,089</td>
+		<td align="right">53,692</td>
+		<td align="right">50,142</td>
+		<td align="right" style="background-color: #cfc">47,868</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t3_2b_wide.png</td>
+		<td align="center">57447 x 5</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">36,114</td>
+		<td align="right">33,364</td>
+		<td align="right">28,921</td>
+		<td align="right" style="background-color: #cfc">27,823</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t3_4b_square.png</td>
+		<td align="center">378 x 380</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">30,061</td>
+		<td align="right">29,559</td>
+		<td align="right">25,615</td>
+		<td align="right" style="background-color: #cfc">24,680</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t3_4b_tall.png</td>
+		<td align="center">3 x 47872</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">41,996</td>
+		<td align="right">41,343</td>
+		<td align="right">41,410</td>
+		<td align="right" style="background-color: #cfc">39,585</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t3_4b_wide.png</td>
+		<td align="center">47872 x 3</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">29,176</td>
+		<td align="right">28,703</td>
+		<td align="right">24,722</td>
+		<td align="right" style="background-color: #0f0">23,780</td>
+		<td align="center" style="background-color: #0f0">501</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t3_8b_square.png</td>
+		<td align="center">267 x 269</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">25,467</td>
+		<td align="right">25,363</td>
+		<td align="right">25,467</td>
+		<td align="right" style="background-color: #cfc">24,584</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t3_8b_tall.png</td>
+		<td align="center">2 x 35904</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">32,750</td>
+		<td align="right">32,642</td>
+		<td align="right">32,750</td>
+		<td align="right" style="background-color: #cfc">31,361</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t3_8b_wide.png</td>
+		<td align="center">35904 x 2</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">24,851</td>
+		<td align="right">24,747</td>
+		<td align="right">24,851</td>
+		<td align="right" style="background-color: #0f0">23,975</td>
+		<td align="center" style="background-color: #0f0">306</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t4_8b_square.png</td>
+		<td align="center">189 x 190</td>
+		<td>Type 4, 8 bit</td>
+		<td align="right">60,045</td>
+		<td align="right">24,920</td>
+		<td align="right">25,100</td>
+		<td align="right" style="background-color: #0f0">24,172</td>
+		<td align="center" style="background-color: #0f0">109</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t4_8b_tall.png</td>
+		<td align="center">1 x 35904</td>
+		<td>Type 4, 8 bit</td>
+		<td align="right">48,570</td>
+		<td align="right">32,345</td>
+		<td align="right">32,518</td>
+		<td align="right" style="background-color: #cfc">31,849</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t4_8b_wide.png</td>
+		<td align="center">35904 x 1</td>
+		<td>Type 4, 8 bit</td>
+		<td align="right">38,146</td>
+		<td align="right" style="background-color: #cfc">24,449</td>
+		<td align="right">24,633</td>
+		<td align="right">0</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t6_8b_square.png</td>
+		<td align="center">133 x 135</td>
+		<td>Type 6, 8 bit</td>
+		<td align="right">64,716</td>
+		<td align="right">24,790</td>
+		<td align="right">24,971</td>
+		<td align="right" style="background-color: #0f0">24,039</td>
+		<td align="center" style="background-color: #0f0">242</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t6_8b_tall.png</td>
+		<td align="center">1 x 17952</td>
+		<td>Type 6, 8 bit</td>
+		<td align="right">59,998</td>
+		<td align="right" style="background-color: #cfc">35,745</td>
+		<td align="right">35,883</td>
+		<td align="right">39,674</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_ascii_t6_8b_wide.png</td>
+		<td align="center">17952 x 1</td>
+		<td>Type 6, 8 bit</td>
+		<td align="right">45,754</td>
+		<td align="right" style="background-color: #cfc">24,453</td>
+		<td align="right">24,637</td>
+		<td align="right">0</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t0_1b_square.png</td>
+		<td align="center">708 x 710</td>
+		<td>Type 0, 1 bit</td>
+		<td align="right">50,796</td>
+		<td align="right">50,796</td>
+		<td align="right">50,257</td>
+		<td align="right" style="background-color: #cfc">49,956</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t0_1b_tall.png</td>
+		<td align="center">8 x 62832</td>
+		<td>Type 0, 1 bit</td>
+		<td align="right">51,831</td>
+		<td align="right">51,705</td>
+		<td align="right">51,798</td>
+		<td align="right" style="background-color: #cfc">49,646</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t0_1b_wide.png</td>
+		<td align="center">62832 x 8</td>
+		<td>Type 0, 1 bit</td>
+		<td align="right">42,276</td>
+		<td align="right">42,276</td>
+		<td align="right">41,689</td>
+		<td align="right" style="background-color: #cfc">41,377</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t0_2b_square.png</td>
+		<td align="center">501 x 502</td>
+		<td>Type 0, 2 bit</td>
+		<td align="right">54,306</td>
+		<td align="right">54,306</td>
+		<td align="right">53,851</td>
+		<td align="right" style="background-color: #cfc">53,586</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t0_2b_tall.png</td>
+		<td align="center">4 x 62832</td>
+		<td>Type 0, 2 bit</td>
+		<td align="right">51,833</td>
+		<td align="right">51,701</td>
+		<td align="right">51,792</td>
+		<td align="right" style="background-color: #cfc">49,653</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t0_2b_wide.png</td>
+		<td align="center">62832 x 4</td>
+		<td>Type 0, 2 bit</td>
+		<td align="right">42,265</td>
+		<td align="right">42,265</td>
+		<td align="right">41,681</td>
+		<td align="right" style="background-color: #cfc">41,375</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t0_4b_square.png</td>
+		<td align="center">354 x 355</td>
+		<td>Type 0, 4 bit</td>
+		<td align="right">43,085</td>
+		<td align="right">43,085</td>
+		<td align="right">42,453</td>
+		<td align="right" style="background-color: #cfc">42,189</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t0_4b_tall.png</td>
+		<td align="center">2 x 62832</td>
+		<td>Type 0, 4 bit</td>
+		<td align="right">51,833</td>
+		<td align="right">51,699</td>
+		<td align="right">51,792</td>
+		<td align="right" style="background-color: #cfc">49,689</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t0_4b_wide.png</td>
+		<td align="center">62832 x 2</td>
+		<td>Type 0, 4 bit</td>
+		<td align="right">42,257</td>
+		<td align="right">42,257</td>
+		<td align="right">41,674</td>
+		<td align="right" style="background-color: #cfc">41,403</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t0_8b_square.png</td>
+		<td align="center">250 x 252</td>
+		<td>Type 0, 8 bit</td>
+		<td align="right">42,822</td>
+		<td align="right">42,822</td>
+		<td align="right" style="background-color: #cfc">42,214</td>
+		<td align="right">42,216</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t0_8b_tall.png</td>
+		<td align="center">1 x 62832</td>
+		<td>Type 0, 8 bit</td>
+		<td align="right">51,818</td>
+		<td align="right">51,691</td>
+		<td align="right">51,783</td>
+		<td align="right" style="background-color: #cfc">49,630</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t0_8b_wide.png</td>
+		<td align="center">62832 x 1</td>
+		<td>Type 0, 8 bit</td>
+		<td align="right">42,237</td>
+		<td align="right">42,126</td>
+		<td align="right">41,654</td>
+		<td align="right" style="background-color: #cfc">41,336</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t2_8b_square.png</td>
+		<td align="center">144 x 146</td>
+		<td>Type 2, 8 bit</td>
+		<td align="right">61,105</td>
+		<td align="right">42,480</td>
+		<td align="right">41,983</td>
+		<td align="right" style="background-color: #cfc">41,668</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t2_8b_tall.png</td>
+		<td align="center">1 x 20944</td>
+		<td>Type 2, 8 bit</td>
+		<td align="right">67,724</td>
+		<td align="right">55,164</td>
+		<td align="right" style="background-color: #cfc">55,087</td>
+		<td align="right">55,610</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t2_8b_wide.png</td>
+		<td align="center">20944 x 1</td>
+		<td>Type 2, 8 bit</td>
+		<td align="right">55,951</td>
+		<td align="right">42,126</td>
+		<td align="right">41,654</td>
+		<td align="right" style="background-color: #cfc">41,336</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t3_1b_square.png</td>
+		<td align="center">708 x 710</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">72,447</td>
+		<td align="right">59,971</td>
+		<td align="right">50,274</td>
+		<td align="right" style="background-color: #cfc">49,956</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t3_1b_tall.png</td>
+		<td align="center">8 x 62832</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">81,742</td>
+		<td align="right">65,926</td>
+		<td align="right">51,815</td>
+		<td align="right" style="background-color: #cfc">49,646</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t3_1b_wide.png</td>
+		<td align="center">62832 x 8</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">72,053</td>
+		<td align="right">59,099</td>
+		<td align="right">41,706</td>
+		<td align="right" style="background-color: #cfc">41,377</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t3_2b_square.png</td>
+		<td align="center">501 x 502</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">58,473</td>
+		<td align="right">54,970</td>
+		<td align="right">53,874</td>
+		<td align="right" style="background-color: #cfc">53,586</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t3_2b_tall.png</td>
+		<td align="center">4 x 62832</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">65,771</td>
+		<td align="right">61,186</td>
+		<td align="right">51,815</td>
+		<td align="right" style="background-color: #cfc">49,653</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t3_2b_wide.png</td>
+		<td align="center">62832 x 4</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">57,768</td>
+		<td align="right">54,264</td>
+		<td align="right">41,704</td>
+		<td align="right" style="background-color: #cfc">41,375</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t3_4b_square.png</td>
+		<td align="center">354 x 355</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">49,710</td>
+		<td align="right">45,993</td>
+		<td align="right">42,512</td>
+		<td align="right" style="background-color: #cfc">42,189</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t3_4b_tall.png</td>
+		<td align="center">2 x 62832</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">55,719</td>
+		<td align="right">54,318</td>
+		<td align="right">51,851</td>
+		<td align="right" style="background-color: #cfc">49,689</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t3_4b_wide.png</td>
+		<td align="center">62832 x 2</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">49,036</td>
+		<td align="right">45,339</td>
+		<td align="right">41,733</td>
+		<td align="right" style="background-color: #cfc">41,403</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t3_8b_square.png</td>
+		<td align="center">250 x 252</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">43,602</td>
+		<td align="right">43,602</td>
+		<td align="right">42,991</td>
+		<td align="right" style="background-color: #cfc">42,616</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t3_8b_tall.png</td>
+		<td align="center">1 x 62832</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">52,597</td>
+		<td align="right">52,468</td>
+		<td align="right">52,560</td>
+		<td align="right" style="background-color: #cfc">50,354</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t3_8b_wide.png</td>
+		<td align="center">62832 x 1</td>
+		<td>Type 3, 8 bit</td>
+		<td align="right">43,015</td>
+		<td align="right">42,904</td>
+		<td align="right">42,431</td>
+		<td align="right" style="background-color: #cfc">42,052</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t4_8b_square.png</td>
+		<td align="center">177 x 178</td>
+		<td>Type 4, 8 bit</td>
+		<td align="right">62,559</td>
+		<td align="right">42,568</td>
+		<td align="right">42,055</td>
+		<td align="right" style="background-color: #cfc">41,723</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t4_8b_tall.png</td>
+		<td align="center">1 x 31416</td>
+		<td>Type 4, 8 bit</td>
+		<td align="right">66,116</td>
+		<td align="right">53,834</td>
+		<td align="right">53,744</td>
+		<td align="right" style="background-color: #cfc">53,549</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t4_8b_wide.png</td>
+		<td align="center">31416 x 1</td>
+		<td>Type 4, 8 bit</td>
+		<td align="right">53,807</td>
+		<td align="right">42,140</td>
+		<td align="right">41,668</td>
+		<td align="right" style="background-color: #cfc">41,336</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t6_8b_square.png</td>
+		<td align="center">125 x 126</td>
+		<td>Type 6, 8 bit</td>
+		<td align="right">61,915</td>
+		<td align="right">42,457</td>
+		<td align="right">41,969</td>
+		<td align="right" style="background-color: #cfc">41,633</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t6_8b_tall.png</td>
+		<td align="center">1 x 15708</td>
+		<td>Type 6, 8 bit</td>
+		<td align="right">68,251</td>
+		<td align="right">55,420</td>
+		<td align="right" style="background-color: #cfc">55,051</td>
+		<td align="right">56,079</td>
+		<td align="center">-</td>
+	</tr>
+	<tr>
+		<td>jquery_seq8_t6_8b_wide.png</td>
+		<td align="center">15708 x 1</td>
+		<td>Type 6, 8 bit</td>
+		<td align="right">57,585</td>
+		<td align="right">42,144</td>
+		<td align="right">41,672</td>
+		<td align="right" style="background-color: #cfc">41,336</td>
+		<td align="center">-</td>
+	</tr>
+</table>
 
 
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/iamcal/PNGStore/zipball/master">zip</a> or
-      <a href="http://github.com/iamcal/PNGStore/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/iamcal/PNGStore</pre>
-    </p>
+	<h3>Notes</h3>
 
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/iamcal/PNGStore">iamcal/PNGStore</a>
-    </div>
+	<p>
+		The 1, 2 &amp; 4 bit Type-3 (indexed color) images are all actuallt 8-bit.
+		If anyone can convince ImageMagick (version 6.6.3-9) to produce them correctly, please let me know!
+	</p>
+
+	<p>
+		The tall/wide images are limit to 65,000 pixels on a side on purpose, so that
+		they don't silently fail creation. However, these images seem to only load
+		intermittently in Firefox 3.6.8 - reloading works about half the time, for no
+		obvious reason. Again, patches welcome.
+	</p>
+
+	<p>
+		The images with alpha channels (Type-4 &amp; Type-8) do not load correctly in Firefox,
+		with all pixel values being slightly off. They look correctly stored in the
+		PNGs, so this could be a canvas bug or a compositing issue. Patches or insight welcome!
+	</p>
+
+
+	<h3>Analysis</h3>
+
+	<p>
+		The numbers look even better this time, although the instability with the wide/tall images
+		and the random offsets in the alpha channeled images make those pretty useless. With
+		those bugs fixed, it might be possible to actually save some space :)
+	</p>
+
+
+
+	<h2>Author</h2>
+
+	<p>Cal Henderson (cal@iamcal.com)</p>
+
+
+
+	<h2>Source Code</h2>
+
+	<p>The source code for these experiments can be found on GitHub: <a href="http://github.com/iamcal/PNGStore">iamcal/PNGStore</a>
+
+	<p>You can clone the project with <a href="http://git-scm.com">Git</a> by running:
+		<pre>$ git clone git://github.com/iamcal/PNGStore</pre>
+	</p>
 
   </div>
 
