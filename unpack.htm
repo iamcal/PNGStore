@@ -48,11 +48,39 @@ function png_to_string(src, unpacker, decoder, callback){
 //
 
 function unpack_1b(b){
-	return "";
+
+	var s = [];
+	for (var i=0; i<b.length; i += 32){
+
+		var b1 = b[i];
+		var b2 = b[i+4];
+		var b3 = b[i+8];
+		var b4 = b[i+12];
+		var b5 = b[i+16];
+		var b6 = b[i+20];
+		var b7 = b[i+24];
+		var b8 = b[i+28];
+		var c = b1 | (b2 << 1) | (b3 << 2) | (b4 << 3) | (b5 << 4) | (b6 << 5) | (b7 << 6) | (b8 << 7);
+
+		if( c > 0 ) s.push(c);
+	}
+	return s;
 }
 
 function unpack_2b(b){
-	return "";
+
+	var s = [];
+	for (var i=0; i<b.length; i += 16){
+
+		var b1 = b[i];
+		var b2 = b[i+4];
+		var b3 = b[i+8];
+		var b4 = b[i+12];
+		var c = b1 | (b2 << 2) | (b3 << 4) | (b4 << 6);
+
+		if( c > 0 ) s.push(c);
+	}
+	return s;
 }
 
 function unpack_4b(b){
@@ -168,10 +196,10 @@ function decode_seq8(b){
 var image_formats = [];
 
 image_formats = [
-	['jquery_ascii_t0_1b_square.png',	unpack_1b, decode_ascii],
-	['jquery_ascii_t0_2b_square.png',	unpack_2b, decode_ascii],
-	['jquery_ascii_t0_4b_square.png',	unpack_4b, decode_ascii],
-	//['jquery_ascii_t0_8b_square.png',	unpack_r, decode_ascii],	// works!
+	['jquery_ascii_t0_1b_square.png',	unpack_1b, decode_ascii],	// works! (not actually 1b any more...)
+	['jquery_ascii_t0_2b_square.png',	unpack_2b, decode_ascii],	// works! (not actually 2b any more...)
+	['jquery_ascii_t0_4b_square.png',	unpack_4b, decode_ascii],	// works! (not actually 4b any more...)
+	['jquery_ascii_t0_8b_square.png',	unpack_r, decode_ascii],	// works!
 
 	//['jquery_ascii_t2_8b_square.png',	unpack_rgb, decode_ascii],	// works!
 
