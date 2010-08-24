@@ -1,8 +1,3 @@
-<p>
-	<a href="#" onclick="test('lipsum'); return false">Test Lorem-Ipsum</a>
-	|
-	<a href="#" onclick="test('jquery'); return false">Test jQuery</a>
-</p>
 
 <table border="1"><tbody id="results"></tbody></table>
 
@@ -249,23 +244,23 @@ function decode_seq8(b){
 
 var image_formats = [];
 
-image_formats = [
-	['jquery_ascii_t0_1b_square.png',	unpack_1b_gs, decode_ascii],	// works! (not actually 1b any more...)
-	['jquery_ascii_t0_2b_square.png',	unpack_2b_gs, decode_ascii],	// works! (not actually 2b any more...)
-	['jquery_ascii_t0_4b_square.png',	unpack_4b_gs, decode_ascii],	// works! (not actually 4b any more...)
-	['jquery_ascii_t0_8b_square.png',	unpack_r, decode_ascii],	// works!
+image_formats = {
+	'jquery_ascii_t0_1b_square.png'	: [unpack_1b_gs, decode_ascii],	// works!
+	'jquery_ascii_t0_2b_square.png'	: [unpack_2b_gs, decode_ascii],	// works!
+	'jquery_ascii_t0_4b_square.png'	: [unpack_4b_gs, decode_ascii],	// works!
+	'jquery_ascii_t0_8b_square.png'	: [unpack_r, decode_ascii],	// works!
 
-	//['jquery_ascii_t2_8b_square.png',	unpack_rgb, decode_ascii],	// works!
+	'jquery_ascii_t2_8b_square.png' : [unpack_rgb, decode_ascii],	// works!
 
-	//['jquery_ascii_t3_1b_square.png',	unpack_1b, decode_ascii],	// is 8b
-	//['jquery_ascii_t3_2b_square.png',	unpack_2b, decode_ascii],	// is 8b
-	//['jquery_ascii_t3_4b_square.png',	unpack_4b, decode_ascii],	// is 8b
-	//['jquery_ascii_t3_8b_square.png',	unpack_r, decode_ascii],	// works!
+	'jquery_ascii_t3_1b_square.png'	: [unpack_1b, decode_ascii],	// is 8b
+	'jquery_ascii_t3_2b_square.png'	: [unpack_2b, decode_ascii],	// is 8b
+	'jquery_ascii_t3_4b_square.png'	: [unpack_4b, decode_ascii],	// is 8b
+	'jquery_ascii_t3_8b_square.png'	: [unpack_r, decode_ascii],	// works!
 
-	//['jquery_ascii_t4_8b_square.png',	unpack_ra, decode_ascii],	// broken - alpha is off
+	'jquery_ascii_t4_8b_square.png'	: [unpack_ra, decode_ascii],	// broken - alpha is a bit off
 
-	//['jquery_ascii_t6_8b_square.png',	unpack_rgba, decode_ascii],	// broken - everything comes back a bit off
-];
+	'jquery_ascii_t6_8b_square.png'	: [unpack_rgba, decode_ascii],	// broken - everything comes back a bit off
+};
 
 
 var elm_map = {};
@@ -273,51 +268,43 @@ var start_snip = 16;
 var end_snip = 5;
 var gi = 1;
 
-function test(prefix){
+function test(){
 
 	var html = "";
 
-	for (var i=0; i<image_formats.length; i++){
-		var a = image_formats[i];
+	for (var id in image_formats){
 
-		if (a[0].substr(0, prefix.length) != prefix){
-
-			continue;
-		}
-
-		var id = "cell"+(gi++);
-		elm_map[a[0]] = id;
+		var uid = "cell"+(gi++);
+		elm_map[id] = uid;
 
 		html += "<tr>";
-		html += "<td id=\""+id+"_a\"></td>";
-		html += "<td id=\""+id+"_b\"></td>";
-		html += "<td id=\""+id+"_c\"></td>";
-		html += "<td id=\""+id+"_d\"></td>";
-		html += "<td id=\""+id+"_e\"></td>";
+		html += "<td id=\""+uid+"_a\"><a href=\"#\" onclick=\"run_test('"+id+"'); return false\">"+id+"</a></td>";
+		html += "<td id=\""+uid+"_b\">-</td>";
+		html += "<td id=\""+uid+"_c\">-</td>";
+		html += "<td id=\""+uid+"_d\">-</td>";
+		html += "<td id=\""+uid+"_e\">-</td>";
 		html += "</tr>";
 	}
 	document.getElementById('results').innerHTML = html;
-
-
-	for (var i=0; i<image_formats.length; i++){
-		var a = image_formats[i];
-
-		if (a[0].substr(0, prefix.length) != prefix) continue;
-
-		png_to_string(a[0], a[1], a[2], function(){
-			var x = a[0];	
-			return function(s){
-				var z = x;
-				document.getElementById(elm_map[z]+'_a').innerHTML = z;
-				document.getElementById(elm_map[z]+'_b').innerHTML = hex_md5(s);
-				document.getElementById(elm_map[z]+'_c').innerHTML = s.substr(0, start_snip);
-				document.getElementById(elm_map[z]+'_d').innerHTML = s.substr(s.length-(end_snip+1), end_snip);
-				document.getElementById(elm_map[z]+'_e').innerHTML = s.length;
-			}
-		}());
-	}
-
 }
 
+function run_test(id){
+
+	var a = image_formats[id];
+
+	png_to_string(id, a[0], a[1], function(){
+		var x = id;	
+		return function(s){
+			var z = x;
+			document.getElementById(elm_map[z]+'_a').innerHTML = z;
+			document.getElementById(elm_map[z]+'_b').innerHTML = hex_md5(s);
+			document.getElementById(elm_map[z]+'_c').innerHTML = s.substr(0, start_snip);
+			document.getElementById(elm_map[z]+'_d').innerHTML = s.substr(s.length-(end_snip+1), end_snip);
+			document.getElementById(elm_map[z]+'_e').innerHTML = s.length;
+		}
+	}());
+}
+
+test();
 
 </script>
