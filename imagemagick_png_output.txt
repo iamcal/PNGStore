@@ -9,9 +9,10 @@ instead.
 >> http://www.libpng.org/pub/png/apps/pngcheck.html
 
 Still need to check out OptiPNG which someone said was a better
-version of pngcrush,
+version of pngcrush, and PNGOUT which claims to be amazing.
 
 >> http://optipng.sourceforge.net/
+>> http://advsys.net/ken/utils.htm
 
 
 Types
