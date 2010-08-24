@@ -1,0 +1,41 @@
+Settings for generating different PNGs in ImageMagick
+=====================================================
+
+Note that `identify` doesn't tell you the real PNG type unless
+you turn on `-debug coder`. You can just use pngcrush instead.
+
+Type 0 (Greyscale)
+	type => 'Grayscale',
+	not sure how to set bit depth correctly
+
+Type 2 (Truecolor)
+	filename => 'png24:foo.png',
+	depth => 8|16,
+
+Type 3 (Indexed)
+	filename => 'png8:foo.png',
+	bit depth is based on colors used (see below)
+
+Type 4 (Greyscale & Alpha)
+	filename => 'foo.png',
+	type => 'GrayscaleMatte',
+	depth => 8|16,
+
+Type 6 (Truecolor & Alpha)
+	filename => 'png32:foo.png',
+	depth => 8|16,
+
+
+
+Type				Channels	Bits per channel	Bit depth
+0 - Greyscale			1		1/2/4/8			1/2/4/8
+2 - Truecolor			3		8/16			24/48
+3 - Indexed			1		1/2/4/8			1/2/4/8
+4 - Greyscale w/ Alpha		2		8/16			16/32
+6 - Truecolor w/ Alpha		4		8/16			32/64
+
+
+1 = 2 colors
+2 = 4 colors
+4 = 16 colors
+8 = 256 colors
