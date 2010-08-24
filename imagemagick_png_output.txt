@@ -2,7 +2,20 @@ Settings for generating different PNGs in ImageMagick
 =====================================================
 
 Note that `identify` doesn't tell you the real PNG type unless
-you turn on `-debug coder`. You can just use pngcrush instead.
+you turn on `-debug coder`. You can just use pngcrush or pngcheck
+instead.
+
+>> http://pmt.sourceforge.net/pngcrush/
+>> http://www.libpng.org/pub/png/apps/pngcheck.html
+
+Still need to check out OptiPNG which someone said was a better
+version of pngcrush,
+
+>> http://optipng.sourceforge.net/
+
+
+Types
+-----
 
 Type 0 (Greyscale)
 	type => 'Grayscale',
@@ -26,6 +39,8 @@ Type 6 (Truecolor & Alpha)
 	depth => 8|16,
 
 
+Full table
+----------
 
 Type				Channels	Bits per channel	Bit depth
 0 - Greyscale			1		1/2/4/8			1/2/4/8
@@ -33,7 +48,6 @@ Type				Channels	Bits per channel	Bit depth
 3 - Indexed			1		1/2/4/8			1/2/4/8
 4 - Greyscale w/ Alpha		2		8/16			16/32
 6 - Truecolor w/ Alpha		4		8/16			32/64
-
 
 1 = 2 colors
 2 = 4 colors
