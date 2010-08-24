@@ -4,6 +4,11 @@
 	$GLOBALS[path] = 'test_images/';
 	$GLOBALS[filter_path] = 'filtered_images/';
 
+	define('OUTPUT_FILTERED',	0);
+	define('OUTPUT_8BIT',		1);
+	define('OUTPUT_8BIT_GRAY',	1);
+	define('OUTPUT_24BIT',		1);
+	define('OUTPUT_32BIT',		1);
 
 
 	encode_file('lipsum.txt', 'lipsum');
@@ -87,9 +92,16 @@
 		$w = floor(sqrt($size));
 		$h = ceil($size / $w);
 
-		create_8b($mode, 'wide',	$bytes, $size,	1);
-		create_8b($mode, 'tall',	$bytes, 1,	$size);
-		create_8b($mode, 'square',	$bytes, $w,	$h);
+		if (OUTPUT_8BIT){
+			create_8b($mode, 'wide',	$bytes, $size,	1);
+			create_8b($mode, 'tall',	$bytes, 1,	$size);
+			create_8b($mode, 'square',	$bytes, $w,	$h);
+		}
+		if (OUTPUT_8BIT_GRAY){
+			create_8b_gray($mode, 'wide',	$bytes, $size,	1);
+			create_8b_gray($mode, 'tall',	$bytes, 1,	$size);
+			create_8b_gray($mode, 'square',	$bytes, $w,	$h);
+		}
 
 
 		#
@@ -101,10 +113,11 @@
 		$w = floor(sqrt($px));
 		$h = ceil($px / $w);
 
-		create_24b($mode, 'wide',	$bytes, $px,	1);
-		create_24b($mode, 'tall',	$bytes, 1,	$px);
-		create_24b($mode, 'square',	$bytes, $w,	$h);
-
+		if (OUTPUT_24BIT){
+			create_24b($mode, 'wide',	$bytes, $px,	1);
+			create_24b($mode, 'tall',	$bytes, 1,	$px);
+			create_24b($mode, 'square',	$bytes, $w,	$h);
+		}
 
 
 		#
@@ -116,9 +129,11 @@
 		$w = floor(sqrt($px));
 		$h = ceil($px / $w);
 
-		create_32b($mode, 'wide',	$bytes, $px,	1);
-		create_32b($mode, 'tall',	$bytes, 1,	$px);
-		create_32b($mode, 'square',	$bytes,	$w,	$h);
+		if (OUTPUT_32BIT){
+			create_32b($mode, 'wide',	$bytes, $px,	1);
+			create_32b($mode, 'tall',	$bytes, 1,	$px);
+			create_32b($mode, 'square',	$bytes,	$w,	$h);
+		}
 	}
 
 	####################################################################################################
@@ -152,6 +167,34 @@
 
 	####################################################################################################
 
+	function create_8b_gray($mode, $shape, $bytes, $w, $h){
+
+		$im = imagecreate($w, $h);
+
+		$cols = array();
+		for ($i=0; $i<256; $i++){
+			$cols[$i] = imagecolorallocate($im, $i, $i, $i);
+		}
+
+		$i=0;
+		for ($y=0; $y<$h; $y++){
+		for ($x=0; $x<$w; $x++){
+
+			$b1 = intval($bytes[$i]);
+
+			$col = $cols[$b1];
+
+			imagesetpixel($im, $x, $y, $col);
+
+			$i++;
+		}
+		}
+
+		save_png($im, "{$mode}_8b_gray_{$shape}");
+		imagedestroy($im);
+	}
+
+	####################################################################################################
 	function create_24b($mode, $shape, $bytes, $w, $h){
 
 		$im = imagecreatetruecolor($w, $h);
@@ -226,7 +269,9 @@
 			if ($d){ $filter |= PNG_FILTER_PAETH; $bits .= '_paeth'; }
 
 			if ($filter){
-				imagepng($im, $GLOBALS[filter_path]."{$name}{$bits}.png", 9, $filter);
+				if (OUTPUT_FILTERED){
+					imagepng($im, $GLOBALS[filter_path]."{$name}{$bits}.png", 9, $filter);
+				}
 			}else{
 				imagepng($im, $GLOBALS[path]."{$name}.png", 9, $filter);
 			}
