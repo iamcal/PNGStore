@@ -55,17 +55,17 @@ sub store_bytes {
 	# type 0 : grayscale
 	#
 
-	&create_type0_8bit($mode, 'square', $bytes);
-	&create_type0_4bit($mode, 'square', $bytes);
-	&create_type0_2bit($mode, 'square', $bytes);
-	&create_type0_1bit($mode, 'square', $bytes);
-return;
+	#&create_type0_8bit($mode, 'square', $bytes);
+	#&create_type0_4bit($mode, 'square', $bytes);
+	#&create_type0_2bit($mode, 'square', $bytes);
+	#&create_type0_1bit($mode, 'square', $bytes);
+
 
 	#
 	# type 2 : truecolor, no alpha
 	#
 
-	&create_type2_8bit($mode, 'square', $bytes);
+	#&create_type2_8bit($mode, 'square', $bytes);
 
 
 	#
@@ -74,9 +74,9 @@ return;
 
 	&create_type3_8bit($mode, 'square', $bytes);
 	&create_type3_4bit($mode, 'square', $bytes);
-	&create_type3_2bit($mode, 'square', $bytes);
-	&create_type3_1bit($mode, 'square', $bytes);
-
+	#&create_type3_2bit($mode, 'square', $bytes);
+	#&create_type3_1bit($mode, 'square', $bytes);
+return;
 
 	#
 	# type 4: greyscale & alpha
@@ -106,8 +106,6 @@ sub create_type0 {
 
 	$im->Set(option => "png:color-type=0");
 	$im->Set(option => "png:bit-depth=$bits");
-
-	
 
 	&pack_image($im, $shape, $bytes, $bits, sub{
 		my $val = $_[0];
@@ -174,11 +172,17 @@ sub create_type3 {
 	my ($mode, $shape, $bytes, $bits) = @_;
 
 	my $im = Image::Magick->new();
-	$im->Set(type => 'Palette');
+
+	$im->Set(option => "png:color-type=3");
+	$im->Set(option => "png:bit-depth=$bits");
+	#$im->Set(type => 'Palette');
 
 	for my $i(0..15){
 		$im->Set("colormap[$i]", sprintf('#%02x%02x%02x', $i, 0, 0));
 	}
+
+	$im->Set(option => "png:color-type=3");
+	$im->Set(option => "png:bit-depth=$bits");
 
 	&pack_image($im, $shape, $bytes, $bits, sub{
 		my $val = $_[0];
@@ -186,10 +190,13 @@ sub create_type3 {
 		return sprintf('#%02x%02x%02x', $val, 0, 0);
 	});
 
+	$im->Set(option => "png:color-type=3");
+	$im->Set(option => "png:bit-depth=$bits");
+
 	my $name = "${mode}_t3_${bits}b_${shape}.png";
 	my $ret = $im->Write(
-		filename => "png8:$dir/$name",
-		depth => 4,
+		filename => "$dir/$name",
+		#depth => 4,
 	);
 
 	&debug($name);
@@ -411,7 +418,7 @@ sub debug {
 
 	print "\n";
 	print "$name:\n";
-	print `pngcrush -n -v $dir/$name | grep '      ' | grep -v \\| | grep -v '       '`;
+	print `./peek.pl $dir/$name`;
 }
 
 #########################################################################################
