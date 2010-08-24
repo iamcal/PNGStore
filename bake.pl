@@ -53,10 +53,10 @@ sub store_bytes {
 	# type 0 : grayscale
 	#
 
-	#&create_type0_8bit($mode, 'square', $bytes);
+	&create_type0_8bit($mode, 'square', $bytes);
 	&create_type0_4bit($mode, 'square', $bytes);
-	#&create_type0_2bit($mode, 'square', $bytes);
-	#&create_type0_1bit($mode, 'square', $bytes);
+	&create_type0_2bit($mode, 'square', $bytes);
+	&create_type0_1bit($mode, 'square', $bytes);
 
 
 	#
@@ -265,6 +265,10 @@ sub pack_image_8bit {
 
 	my $im = Image::Magick->new(size=>"${w}x${h}");
 	$im->ReadImage('xc:white');
+	if ($gs){
+		$im->Set(matte => 1);
+		$im->Set(alpha => 'On');
+	}
 
 	my $i=0;
 	for my $y(0..$h-1){
@@ -319,6 +323,10 @@ sub pack_image_2bit {
 
 	my $im = Image::Magick->new(size=>"${w}x${h}");
 	$im->ReadImage('xc:white');
+	if ($gs){
+		$im->Set(matte => 1);
+		$im->Set(alpha => 'On');
+	}
 
 	my $i=0;
 	my $c=0;
@@ -347,6 +355,10 @@ sub pack_image_1bit {
 
 	my $im = Image::Magick->new(size=>"${w}x${h}");
 	$im->ReadImage('xc:white');
+	if ($gs){
+		$im->Set(matte => 1);
+		$im->Set(alpha => 'On');
+	}
 
 	my $i=0;
 	my $c=0;
