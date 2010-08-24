@@ -30,8 +30,8 @@ function png_to_string(src, unpacker, decoder, callback){
 		c.style.width = w;
 		c.height = h;
 		c.style.height = h;
-		t.globalAlpha = 1.0;
-		t.globalCompositeOperation = 'copy';
+		//t.globalAlpha = 1.0;
+		//t.globalCompositeOperation = 'copy';
 		t.drawImage(o, 0, 0);
 		var b = t.getImageData( 0, 0, w, h ).data;
 		callback(decoder(unpacker(b)));
@@ -39,13 +39,35 @@ function png_to_string(src, unpacker, decoder, callback){
 	o.onerror = function(){
 		callback('ERROR');
 	}
-	o.src = 'test_images/'+src;
+	o.src = 'perl_tests/'+src;
 }
 
 //
 // unpackers take image pixels and turn them into an array of bytes.
 // those bytes will get passed to a decoder to turn them into a string.
 //
+
+function unpack_1b(b){
+	return "";
+}
+
+function unpack_2b(b){
+	return "";
+}
+
+function unpack_4b(b){
+
+	var s = [];
+	for (var i=0; i<b.length; i += 8){
+
+		var b1 = b[i];
+		var b2 = b[i+4];
+		var c = b1 | (b2 << 4);
+
+		if( c > 0 ) s.push(c);
+	}
+	return s;
+}
 
 function unpack_r(b){
 
@@ -67,14 +89,26 @@ function unpack_rgb(b){
 	return s;
 }
 
+function unpack_ra(b){
+
+	var s = [];
+	for (var i=0; i < b.length; i+=4){
+		if (b[i+0] > 0) s.push(b[i+0]);
+		if (b[i+3] > 0) s.push(b[i+3]);
+	}
+	return s;
+}
+
 function unpack_rgba(b){
+
+	console.log(b.slice(0,8));
 
 	var s = [];
 	for (var i= 0; i<b.length; i+=4){
 		if( b[i] > 0 ) s.push(b[i]);
 		if( b[i+1] > 0 ) s.push(b[i+1]);
 		if( b[i+2] > 0 ) s.push(b[i+2]);
-		if( b[i+3] > 0 ) s.push(b[i+3] / 2);
+		if( b[i+3] > 0 ) s.push(b[i+3]);
 	}
 	return s;
 }
@@ -90,8 +124,6 @@ function decode_ascii(b){
 }
 
 function decode_seq8(b){
-
-//console.log(b);
 
 	var s = "";
 	var num = Math.ceil(b.length / 7);
@@ -133,57 +165,26 @@ function decode_seq8(b){
 // test multiple images...
 //
 
-var image_formats = [
-	['jquery_ascii_8b_wide.png',		unpack_r, decode_ascii],
-	['jquery_ascii_8b_tall.png',		unpack_r, decode_ascii],
-	['jquery_ascii_8b_square.png',		unpack_r, decode_ascii],
+var image_formats = [];
 
-	['jquery_ascii_24b_wide.png',		unpack_rgb, decode_ascii],
-	['jquery_ascii_24b_tall.png',		unpack_rgb, decode_ascii],
-	['jquery_ascii_24b_square.png',		unpack_rgb, decode_ascii],
+image_formats = [
+	['jquery_ascii_t0_1b_square.png',	unpack_1b, decode_ascii],
+	['jquery_ascii_t0_2b_square.png',	unpack_2b, decode_ascii],
+	['jquery_ascii_t0_4b_square.png',	unpack_4b, decode_ascii],
+	//['jquery_ascii_t0_8b_square.png',	unpack_r, decode_ascii],	// works!
 
-	['jquery_ascii_32b_wide.png',		unpack_rgba, decode_ascii],
-	['jquery_ascii_32b_tall.png',		unpack_rgba, decode_ascii],
-	['jquery_ascii_32b_square.png',		unpack_rgba, decode_ascii],
+	//['jquery_ascii_t2_8b_square.png',	unpack_rgb, decode_ascii],	// works!
 
-	['jquery_seq8_8b_wide.png',		unpack_r, decode_seq8],
-	['jquery_seq8_8b_tall.png',		unpack_r, decode_seq8],
-	['jquery_seq8_8b_square.png',		unpack_r, decode_seq8],
+	//['jquery_ascii_t3_1b_square.png',	unpack_1b, decode_ascii],
+	//['jquery_ascii_t3_2b_square.png',	unpack_2b, decode_ascii],
+	//['jquery_ascii_t3_4b_square.png',	unpack_4b, decode_ascii],
+	//['jquery_ascii_t3_8b_square.png',	unpack_r, decode_ascii],	// works!
 
-	['jquery_seq8_24b_wide.png',		unpack_rgb, decode_seq8],
-	['jquery_seq8_24b_tall.png',		unpack_rgb, decode_seq8],
-	['jquery_seq8_24b_square.png',		unpack_rgb, decode_seq8],
+	//['jquery_ascii_t4_8b_square.png',	unpack_ra, decode_ascii],	// broken - alpha is off
 
-	['jquery_seq8_32b_wide.png',		unpack_rgba, decode_seq8],
-	['jquery_seq8_32b_tall.png',		unpack_rgba, decode_seq8],
-	['jquery_seq8_32b_square.png',		unpack_rgba, decode_seq8],
-
-	///////////////
-
-	['lipsum_ascii_8b_wide.png',		unpack_r, decode_ascii],
-	['lipsum_ascii_8b_tall.png',		unpack_r, decode_ascii],
-	['lipsum_ascii_8b_square.png',		unpack_r, decode_ascii],
-
-	['lipsum_ascii_24b_wide.png',		unpack_rgb, decode_ascii],
-	['lipsum_ascii_24b_tall.png',		unpack_rgb, decode_ascii],
-	['lipsum_ascii_24b_square.png',		unpack_rgb, decode_ascii],
-
-	['lipsum_ascii_32b_wide.png',		unpack_rgba, decode_ascii],
-	['lipsum_ascii_32b_tall.png',		unpack_rgba, decode_ascii],
-	['lipsum_ascii_32b_square.png',		unpack_rgba, decode_ascii],
-
-	['lipsum_seq8_8b_wide.png',		unpack_r, decode_seq8],
-	['lipsum_seq8_8b_tall.png',		unpack_r, decode_seq8],
-	['lipsum_seq8_8b_square.png',		unpack_r, decode_seq8],
-
-	['lipsum_seq8_24b_wide.png',		unpack_rgb, decode_seq8],
-	['lipsum_seq8_24b_tall.png',		unpack_rgb, decode_seq8],
-	['lipsum_seq8_24b_square.png',		unpack_rgb, decode_seq8],
-
-	['lipsum_seq8_32b_wide.png',		unpack_rgba, decode_seq8],
-	['lipsum_seq8_32b_tall.png',		unpack_rgba, decode_seq8],
-	['lipsum_seq8_32b_square.png',		unpack_rgba, decode_seq8],
+	//['jquery_ascii_t6_8b_square.png',	unpack_rgba, decode_ascii],	// broken - everything comes back a bit off
 ];
+
 
 var elm_map = {};
 var start_snip = 16;
