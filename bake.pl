@@ -54,7 +54,7 @@ sub store_bytes {
 	#
 
 	#&create_type0_8bit($mode, 'square', $bytes);
-	#&create_type0_4bit($mode, 'square', $bytes);
+	&create_type0_4bit($mode, 'square', $bytes);
 	#&create_type0_2bit($mode, 'square', $bytes);
 	#&create_type0_1bit($mode, 'square', $bytes);
 
@@ -80,7 +80,7 @@ sub store_bytes {
 	# type 4: greyscale & alpha
 	#
 
-	&create_type4_8bit($mode, 'square', $bytes);
+	#&create_type4_8bit($mode, 'square', $bytes);
 
 
 	#
@@ -102,7 +102,7 @@ sub create_type0 {
 
 	my $im = &pack_image($shape, $bytes, $bits, sub{
 		return sprintf('#%02x%02x%02x', $_[0], $_[0], $_[0]);
-	});
+	}, 0);
 
 	my $name = "${mode}_t0_${bits}b_${shape}.png";
 	my $ret = $im->Write(
@@ -250,17 +250,17 @@ sub create_type6_8bit {
 #########################################################################################
 
 sub pack_image {
-	my ($shape, $bytes, $bits, $cf) = @_;
+	my ($shape, $bytes, $bits, $cf, $gs) = @_;
 
-	return &pack_image_8bit($shape, $bytes, $cf) if $bits == 8;
-	return &pack_image_4bit($shape, $bytes, $cf) if $bits == 4;
-	return &pack_image_2bit($shape, $bytes, $cf) if $bits == 2;
-	return &pack_image_1bit($shape, $bytes, $cf) if $bits == 1;
+	return &pack_image_8bit($shape, $bytes, $cf, $gs) if $bits == 8;
+	return &pack_image_4bit($shape, $bytes, $cf, $gs) if $bits == 4;
+	return &pack_image_2bit($shape, $bytes, $cf, $gs) if $bits == 2;
+	return &pack_image_1bit($shape, $bytes, $cf, $gs) if $bits == 1;
 	return undef;
 }
 
 sub pack_image_8bit {
-	my ($shape, $bytes, $cf) = @_;
+	my ($shape, $bytes, $cf, $gs) = @_;
 	my ($w, $h) = &get_dims($shape, scalar(@{$bytes}), 1);
 
 	my $im = Image::Magick->new(size=>"${w}x${h}");
@@ -281,11 +281,15 @@ sub pack_image_8bit {
 }
 
 sub pack_image_4bit {
-	my ($shape, $bytes, $cf) = @_;
+	my ($shape, $bytes, $cf, $gs) = @_;
 	my ($w, $h) = &get_dims($shape, scalar(@{$bytes}), 2, 1);
 
 	my $im = Image::Magick->new(size=>"${w}x${h}");
 	$im->ReadImage('xc:white');
+	if ($gs){
+		$im->Set(matte => 1);
+		$im->Set(alpha => 'On');
+	}
 
 	my $i=0;
 	my $c=0;
@@ -295,10 +299,14 @@ sub pack_image_4bit {
 		my $b1 = $bytes->[$i] || 0;
 		$b1 = $c ? 0xF & ($b1 >> 4) : 0xF & $b1;
 
-		$im->Set("pixel[$x,$y]" => &$cf($b1));
+		my $color = &$cf($b1);
+		#print "encoding byte $bytes->[$i] as $c: $b1 ($color)\n";
+
+		$im->Set("pixel[$x,$y]" => $color);
 
 		if ($c){ $i++; }
 		$c = $c ? 0 : 1;
+		#if ($c == 0){ exit; }
 	}
 	}
 
@@ -306,7 +314,7 @@ sub pack_image_4bit {
 }
 
 sub pack_image_2bit {
-	my ($shape, $bytes, $cf) = @_;
+	my ($shape, $bytes, $cf, $gs) = @_;
 	my ($w, $h) = &get_dims($shape, scalar(@{$bytes}), 4, 1);
 
 	my $im = Image::Magick->new(size=>"${w}x${h}");
@@ -334,7 +342,7 @@ sub pack_image_2bit {
 }
 
 sub pack_image_1bit {
-	my ($shape, $bytes, $cf) = @_;
+	my ($shape, $bytes, $cf, $gs) = @_;
 	my ($w, $h) = &get_dims($shape, scalar(@{$bytes}), 8, 1);
 
 	my $im = Image::Magick->new(size=>"${w}x${h}");
