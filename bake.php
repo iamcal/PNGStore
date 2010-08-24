@@ -1,8 +1,8 @@
 <?
 	header('Content-type: text/plain');
 
-	$GLOBALS[path] = 'test_images/';
-	$GLOBALS[filter_path] = 'filtered_images/';
+	$GLOBALS[path] = 'phpgd_images/';
+	$GLOBALS[filter_path] = 'phpgd_filtered_images/';
 
 	define('OUTPUT_FILTERED',	0);
 	define('OUTPUT_8BIT',		1);
