@@ -1,6 +1,8 @@
 This is just for checking the 8-in-7 encoding...
 
 
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> lipsum.txt
+
 First 8 bytes:
 	Lorem ip
 	4C 6F 72 65 6D 20 69 70
@@ -11,4 +13,14 @@ Packed into 7:
 	99 BF 96 5D A8 34 F0
 	153 191 150 93 168 52 240
 	???]¨4?
+
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> jquery-1.4.2.min.js
+
+First 8 bytes:
+	(functio
+	28 66 75 6E 63 74 69 6F
+	40 102 117 110 99 116 105 111
 
