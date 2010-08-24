@@ -1,6 +1,8 @@
 
 <table border="1"><tbody id="results"></tbody></table>
 
+<p><a href="#" onclick="run_all(); return false;">Run All</a></p>
+
 <script src="md5.js"></script>
 <script>
 
@@ -34,7 +36,7 @@ function png_to_string(src, unpacker, decoder, callback){
 	o.onerror = function(){
 		callback('ERROR');
 	}
-	o.src = 'perl_images/'+src+'?'+(new Date().getTime());
+	o.src = src+'?'+(new Date().getTime());
 }
 
 //
@@ -242,9 +244,7 @@ function decode_seq8(b){
 // test multiple images...
 //
 
-var image_formats = [];
-
-image_formats = {
+var base_image_formats = {
 	'jquery_ascii_t0_1b_square.png'	: [unpack_1b_gs, decode_ascii],	// works!
 	'jquery_ascii_t0_2b_square.png'	: [unpack_2b_gs, decode_ascii],	// works!
 	'jquery_ascii_t0_4b_square.png'	: [unpack_4b_gs, decode_ascii],	// works!
@@ -261,6 +261,20 @@ image_formats = {
 
 	'jquery_ascii_t6_8b_square.png'	: [unpack_rgba, decode_ascii],	// broken - everything comes back a bit off
 };
+
+var folders = [
+	'perl_images/',
+	'perl_images_pngcrush/',
+	'perl_images_optipng/',
+	'perl_images_pngout/'
+];
+
+var image_formats = {};
+for (var i=0; i<folders.length; i++){
+	for (var j in base_image_formats){
+		image_formats[folders[i]+j] = base_image_formats[j];
+	}
+}
 
 
 var elm_map = {};
@@ -303,6 +317,12 @@ function run_test(id){
 			document.getElementById(elm_map[z]+'_e').innerHTML = s.length;
 		}
 	}());
+}
+
+function run_all(){
+	for (var i in image_formats){
+		run_test(i);
+	}
 }
 
 test();
