@@ -7,6 +7,7 @@ use Image::Magick;
 use Data::Dumper;
 
 my $dir = "perl_images";
+my @shapes = ('square', 'wide', 'tall');
 
 &encode_file('jquery-1.4.2.min.js', 'jquery');
 exit;
@@ -55,41 +56,41 @@ sub store_bytes {
 	# type 0 : grayscale
 	#
 
-	#&create_type0_8bit($mode, 'square', $bytes);
-	#&create_type0_4bit($mode, 'square', $bytes);
-	#&create_type0_2bit($mode, 'square', $bytes);
-	#&create_type0_1bit($mode, 'square', $bytes);
+	&create_type0_8bit($mode, $_, $bytes) for @shapes;
+	&create_type0_4bit($mode, $_, $bytes) for @shapes;
+	&create_type0_2bit($mode, $_, $bytes) for @shapes;
+	&create_type0_1bit($mode, $_, $bytes) for @shapes;
 
 
 	#
 	# type 2 : truecolor, no alpha
 	#
 
-	#&create_type2_8bit($mode, 'square', $bytes);
+	&create_type2_8bit($mode, $_, $bytes) for @shapes;
 
 
 	#
 	# type 3 : indexed
 	#
 
-	&create_type3_8bit($mode, 'square', $bytes);
-	&create_type3_4bit($mode, 'square', $bytes);
-	#&create_type3_2bit($mode, 'square', $bytes);
-	#&create_type3_1bit($mode, 'square', $bytes);
-return;
+	&create_type3_8bit($mode, $_, $bytes) for @shapes;
+	&create_type3_4bit($mode, $_, $bytes) for @shapes;
+	&create_type3_2bit($mode, $_, $bytes) for @shapes;
+	&create_type3_1bit($mode, $_, $bytes) for @shapes;
+
 
 	#
 	# type 4: greyscale & alpha
 	#
 
-	&create_type4_8bit($mode, 'square', $bytes);
+	&create_type4_8bit($mode, $_, $bytes) for @shapes;
 
 
 	#
 	# type 6: turecolor & alpha
 	#
 
-	&create_type6_8bit($mode, 'square', $bytes);
+	&create_type6_8bit($mode, $_, $bytes) for @shapes;
 }
 
 #########################################################################################
@@ -120,13 +121,14 @@ sub create_type0 {
 
 
 	my $name = "${mode}_t0_${bits}b_${shape}.png";
+	`rm -f $dir/$name`;
 	my $ret = $im->Write(
 		filename => "$dir/$name",
 		#type => 'Grayscale',
 		#depth => 2,
 	);
 
-	&debug($name);
+	&debug($ret, $name);
 }
 
 #########################################################################################
@@ -153,12 +155,13 @@ sub create_type2_8bit {
 	}
 
 	my $name = "${mode}_t2_8b_${shape}.png";
+	`rm -f $dir/$name`;
 	my $ret = $im->Write(
 		filename => "png24:$dir/$name",
 		#depth => 8,
 	);
 
-	&debug($name);
+	&debug($ret, $name);
 }
 
 #########################################################################################
@@ -173,33 +176,47 @@ sub create_type3 {
 
 	my $im = Image::Magick->new();
 
+	$im->Set(type => 'Palette');
 	$im->Set(option => "png:color-type=3");
 	$im->Set(option => "png:bit-depth=$bits");
-	#$im->Set(type => 'Palette');
+	#$im->Set('background' => "#000000");
 
 	for my $i(0..15){
 		$im->Set("colormap[$i]", sprintf('#%02x%02x%02x', $i, 0, 0));
 	}
 
-	$im->Set(option => "png:color-type=3");
+	#$im->Set(option => "png:color-type=3");
 	$im->Set(option => "png:bit-depth=$bits");
 
 	&pack_image($im, $shape, $bytes, $bits, sub{
 		my $val = $_[0];
 		#print "$val, ";
+		#return $val;
 		return sprintf('#%02x%02x%02x', $val, 0, 0);
 	});
 
-	$im->Set(option => "png:color-type=3");
+
+	#my $map = {};
+	#my ($w, $h) = &get_dims($shape, scalar(@{$bytes}), 1);	
+	#for my $y(0..$h-1){
+	#for my $x(0..$w-1){
+	#	my $in = $im->Get("index[$x,$y]");
+	#	print "$in ";
+	#}
+	#}
+
+
+	#$im->Set(option => "png:color-type=3");
 	$im->Set(option => "png:bit-depth=$bits");
 
 	my $name = "${mode}_t3_${bits}b_${shape}.png";
+	`rm -f $dir/$name`;
 	my $ret = $im->Write(
 		filename => "$dir/$name",
-		#depth => 4,
+		#depth => $bits,
 	);
 
-	&debug($name);
+	&debug($ret, $name);
 }
 
 #########################################################################################
@@ -230,8 +247,10 @@ sub create_type4_8bit {
 	}
 	}
 
-	my $name = "${mode}_t4_8b_${shape}.png";
 	#$im->Set(option => "png:color-type=4");	
+
+	my $name = "${mode}_t4_8b_${shape}.png";
+	`rm -f $dir/$name`;
 	my $ret = $im->Write(
 		filename => "$dir/$name",
 		type => 'GrayscaleMatte',
@@ -239,7 +258,7 @@ sub create_type4_8bit {
 		#depth => 8,
 	);
 
-	&debug($name);
+	&debug($ret, $name);
 }
 
 #########################################################################################
@@ -273,12 +292,13 @@ sub create_type6_8bit {
 	}
 
 	my $name = "${mode}_t6_8b_${shape}.png";
+	`rm -f $dir/$name`;
 	my $ret = $im->Write(
 		filename => "png32:$dir/$name",
 		depth => 8,
 	);
 
-	&debug($name);
+	&debug($ret, $name);
 }
 
 #########################################################################################
@@ -319,7 +339,7 @@ sub pack_image_4bit {
 	my ($w, $h) = &get_dims($shape, scalar(@{$bytes}), 2, 1);
 
 	$im->Set(size=>"${w}x${h}");
-	$im->ReadImage('xc:white');
+	$im->ReadImage('xc:black');
 
 	my $i=0;
 	my $c=0;
@@ -333,6 +353,7 @@ sub pack_image_4bit {
 		#print "encoding byte $bytes->[$i] as $c: $b1 ($color)\n";
 
 		$im->Set("pixel[$x,$y]" => $color);
+		#$im->Set("index[$x,$y]" => $color);
 
 		if ($c){ $i++; }
 		$c = $c ? 0 : 1;
@@ -405,19 +426,28 @@ sub get_dims {
         my $w = floor(sqrt($px));
         my $h = ceil($px / $w);
 
-	# todo - deal with px being over 65535
-	if ($shape eq 'wide'){ return ($px, 1); }
-	if ($shape eq 'tall'){ return (1, $px); }
+	my $short = 1;
+	my $long = $px;
+	my $long_limit = 65000;
+
+	while ($long > $long_limit){
+		$short++;
+		$long = ceil($px / $short);
+	}
+
+	if ($shape eq 'wide'){ return ($long, $short); }
+	if ($shape eq 'tall'){ return ($short, $long); }
 	return ($w, $h);
 }
 
 #########################################################################################
 
 sub debug {
-	my ($name) = @_;
+	my ($ret, $name) = @_;
 
 	print "\n";
 	print "$name:\n";
+	if ($ret){ print "\tERROR: $ret\n"; }
 	print `./peek.pl $dir/$name`;
 }
 
