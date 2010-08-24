@@ -53,41 +53,41 @@ sub store_bytes {
 	# type 0 : grayscale
 	#
 
-	#&create_type0_8bit($mode, 'square', $bytes);
-	#&create_type0_4bit($mode, 'square', $bytes);
-	#&create_type0_2bit($mode, 'square', $bytes);
-	#&create_type0_1bit($mode, 'square', $bytes);
+	&create_type0_8bit($mode, 'square', $bytes);
+	&create_type0_4bit($mode, 'square', $bytes);
+	&create_type0_2bit($mode, 'square', $bytes);
+	&create_type0_1bit($mode, 'square', $bytes);
 
 
 	#
 	# type 2 : truecolor, no alpha
 	#
 
-	#&create_type2_8bit($mode, 'square', $bytes);
+	&create_type2_8bit($mode, 'square', $bytes);
 
 
 	#
 	# type 3 : indexed
 	#
 
-	#&create_type3_8bit($mode, 'square', $bytes);
+	&create_type3_8bit($mode, 'square', $bytes);
 	&create_type3_4bit($mode, 'square', $bytes);
-	#&create_type3_2bit($mode, 'square', $bytes);
-	#&create_type3_1bit($mode, 'square', $bytes);
+	&create_type3_2bit($mode, 'square', $bytes);
+	&create_type3_1bit($mode, 'square', $bytes);
 
 
 	#
 	# type 4: greyscale & alpha
 	#
 
-	#&create_type4_8bit($mode, 'square', $bytes);
+	&create_type4_8bit($mode, 'square', $bytes);
 
 
 	#
 	# type 6: turecolor & alpha
 	#
 
-	#&create_type6_8bit($mode, 'square', $bytes);
+	&create_type6_8bit($mode, 'square', $bytes);
 }
 
 #########################################################################################
@@ -102,11 +102,8 @@ sub create_type0 {
 
 	my $im = Image::Magick->new();
 
-	$im->Set(matte => 1);
-	$im->Set(alpha => 'On');
-
 	&pack_image($im, $shape, $bytes, $bits, sub{
-		my $val = $_[0] << 4;
+		my $val = $_[0];
 		return sprintf('#%02x%02x%02x', $val, $val, $val);
 	});
 
@@ -114,7 +111,7 @@ sub create_type0 {
 	my $ret = $im->Write(
 		filename => "perl_tests/$name",
 		type => 'Grayscale',
-		depth => 2,
+		#depth => 2,
 	);
 
 	&debug($name);
@@ -146,7 +143,7 @@ sub create_type2_8bit {
 	my $name = "${mode}_t2_8b_${shape}.png";
 	my $ret = $im->Write(
 		filename => "png24:perl_tests/$name",
-		depth => 8,
+		#depth => 8,
 	);
 
 	&debug($name);
@@ -163,6 +160,7 @@ sub create_type3 {
 	my ($mode, $shape, $bytes, $bits) = @_;
 
 	my $im = Image::Magick->new();
+	$im->Set(type => 'Palette');
 
 	for my $i(0..15){
 		$im->Set("colormap[$i]", sprintf('#%02x%02x%02x', $i, 0, 0));
@@ -177,6 +175,7 @@ sub create_type3 {
 	my $name = "${mode}_t3_${bits}b_${shape}.png";
 	my $ret = $im->Write(
 		filename => "png8:perl_tests/$name",
+		depth => 4,
 	);
 
 	&debug($name);
@@ -195,7 +194,7 @@ sub create_type4_8bit {
 	my $im = Image::Magick->new(size=>"${w}x${h}");
 	$im->ReadImage('xc:white');
 	$im->Set(matte => 1);
-	$im->Set(alpha => 'On');
+ 	$im->Set(alpha => 'On');
 
 	my $i=0;
 	for my $y(0..$h-1){
@@ -310,13 +309,13 @@ sub pack_image_4bit {
 		$b1 = $c ? 0xF & ($b1 >> 4) : 0xF & $b1;
 
 		my $color = &$cf($b1);
-		print "encoding byte $bytes->[$i] as $c: $b1 ($color)\n";
+		#print "encoding byte $bytes->[$i] as $c: $b1 ($color)\n";
 
 		$im->Set("pixel[$x,$y]" => $color);
 
 		if ($c){ $i++; }
 		$c = $c ? 0 : 1;
-		if ($c == 0){ exit; }
+		#if ($c == 0){ exit; }
 	}
 	}
 

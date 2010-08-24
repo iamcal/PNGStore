@@ -39,7 +39,7 @@ function png_to_string(src, unpacker, decoder, callback){
 	o.onerror = function(){
 		callback('ERROR');
 	}
-	o.src = 'perl_tests/'+src;
+	o.src = 'perl_tests/'+src+'?'+(new Date().getTime());
 }
 
 //
@@ -84,6 +84,8 @@ function unpack_2b(b){
 }
 
 function unpack_4b(b){
+
+console.log(b);
 
 	var s = [];
 	for (var i=0; i<b.length; i += 8){
@@ -196,17 +198,17 @@ function decode_seq8(b){
 var image_formats = [];
 
 image_formats = [
-	['jquery_ascii_t0_1b_square.png',	unpack_1b, decode_ascii],	// works! (not actually 1b any more...)
-	['jquery_ascii_t0_2b_square.png',	unpack_2b, decode_ascii],	// works! (not actually 2b any more...)
-	['jquery_ascii_t0_4b_square.png',	unpack_4b, decode_ascii],	// works! (not actually 4b any more...)
-	['jquery_ascii_t0_8b_square.png',	unpack_r, decode_ascii],	// works!
+	//['jquery_ascii_t0_1b_square.png',	unpack_1b, decode_ascii],	// works! (not actually 1b any more...)
+	//['jquery_ascii_t0_2b_square.png',	unpack_2b, decode_ascii],	// works! (not actually 2b any more...)
+	//['jquery_ascii_t0_4b_square.png',	unpack_4b, decode_ascii],	// works! (not actually 4b any more...)
+	//['jquery_ascii_t0_8b_square.png',	unpack_r, decode_ascii],	// works!
 
 	//['jquery_ascii_t2_8b_square.png',	unpack_rgb, decode_ascii],	// works!
 
-	//['jquery_ascii_t3_1b_square.png',	unpack_1b, decode_ascii],
-	//['jquery_ascii_t3_2b_square.png',	unpack_2b, decode_ascii],
-	//['jquery_ascii_t3_4b_square.png',	unpack_4b, decode_ascii],
-	//['jquery_ascii_t3_8b_square.png',	unpack_r, decode_ascii],	// works!
+	['jquery_ascii_t3_1b_square.png',	unpack_1b, decode_ascii],	// is 8b
+	['jquery_ascii_t3_2b_square.png',	unpack_2b, decode_ascii],	// is 8b
+	['jquery_ascii_t3_4b_square.png',	unpack_4b, decode_ascii],	// is 8b
+	['jquery_ascii_t3_8b_square.png',	unpack_r, decode_ascii],	// works!
 
 	//['jquery_ascii_t4_8b_square.png',	unpack_ra, decode_ascii],	// broken - alpha is off
 
