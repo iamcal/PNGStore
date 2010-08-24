@@ -59,7 +59,7 @@ sub store_bytes {
 	&create_type0_4bit($mode, 'square', $bytes);
 	&create_type0_2bit($mode, 'square', $bytes);
 	&create_type0_1bit($mode, 'square', $bytes);
-
+return;
 
 	#
 	# type 2 : truecolor, no alpha
@@ -104,15 +104,27 @@ sub create_type0 {
 
 	my $im = Image::Magick->new();
 
+	$im->Set(option => "png:color-type=0");
+	$im->Set(option => "png:bit-depth=$bits");
+
+	
+
 	&pack_image($im, $shape, $bytes, $bits, sub{
 		my $val = $_[0];
-		return sprintf('#%02x%02x%02x', $val, $val, $val);
+		if ($bits == 4){ $val = $_[0] | ($_[0] << 4); }
+		if ($bits == 2){ $val = $_[0] | ($_[0] << 2) | ($_[0] << 4) | ($_[0] << 6); }
+		if ($bits == 1){ $val = $_[0] | ($_[0] << 1) | ($_[0] << 2) | ($_[0] << 3) | ($_[0] << 4) | ($_[0] << 5) | ($_[0] << 6) | ($_[0] << 7); }
+
+		my $color = sprintf('#%02x%02x%02x', $val, $val, $val);
+		#print "$color ";
+		return $color;
 	});
+
 
 	my $name = "${mode}_t0_${bits}b_${shape}.png";
 	my $ret = $im->Write(
 		filename => "$dir/$name",
-		type => 'Grayscale',
+		#type => 'Grayscale',
 		#depth => 2,
 	);
 
