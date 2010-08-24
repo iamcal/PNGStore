@@ -6,6 +6,8 @@ use POSIX qw(ceil floor);
 use Image::Magick;
 use Data::Dumper;
 
+my $dir = "perl_images";
+
 &encode_file('jquery-1.4.2.min.js', 'jquery');
 exit;
 
@@ -109,7 +111,7 @@ sub create_type0 {
 
 	my $name = "${mode}_t0_${bits}b_${shape}.png";
 	my $ret = $im->Write(
-		filename => "perl_tests/$name",
+		filename => "$dir/$name",
 		type => 'Grayscale',
 		#depth => 2,
 	);
@@ -142,7 +144,7 @@ sub create_type2_8bit {
 
 	my $name = "${mode}_t2_8b_${shape}.png";
 	my $ret = $im->Write(
-		filename => "png24:perl_tests/$name",
+		filename => "png24:$dir/$name",
 		#depth => 8,
 	);
 
@@ -174,7 +176,7 @@ sub create_type3 {
 
 	my $name = "${mode}_t3_${bits}b_${shape}.png";
 	my $ret = $im->Write(
-		filename => "png8:perl_tests/$name",
+		filename => "png8:$dir/$name",
 		depth => 4,
 	);
 
@@ -212,7 +214,7 @@ sub create_type4_8bit {
 	my $name = "${mode}_t4_8b_${shape}.png";
 	#$im->Set(option => "png:color-type=4");	
 	my $ret = $im->Write(
-		filename => "perl_tests/$name",
+		filename => "$dir/$name",
 		type => 'GrayscaleMatte',
 		matte => 1,
 		#depth => 8,
@@ -253,7 +255,7 @@ sub create_type6_8bit {
 
 	my $name = "${mode}_t6_8b_${shape}.png";
 	my $ret = $im->Write(
-		filename => "png32:perl_tests/$name",
+		filename => "png32:$dir/$name",
 		depth => 8,
 	);
 
@@ -397,7 +399,7 @@ sub debug {
 
 	print "\n";
 	print "$name:\n";
-	print `pngcrush -n -v perl_tests/$name | grep '      ' | grep -v \\| | grep -v '       '`;
+	print `pngcrush -n -v $dir/$name | grep '      ' | grep -v \\| | grep -v '       '`;
 }
 
 #########################################################################################
