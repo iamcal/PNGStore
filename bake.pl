@@ -7,7 +7,6 @@ use Image::Magick;
 use Data::Dumper;
 
 &encode_file('jquery-1.4.2.min.js', 'jquery');
-`cp -r perl_tests /var/www/cal/scrumjax.com/`;
 exit;
 
 sub encode_file {
@@ -64,7 +63,7 @@ sub store_bytes {
 	# type 2 : truecolor, no alpha
 	#
 
-	&create_type2_8bit($mode, 'square', $bytes);
+	#&create_type2_8bit($mode, 'square', $bytes);
 
 
 	#
@@ -81,7 +80,7 @@ sub store_bytes {
 	# type 4: greyscale & alpha
 	#
 
-	#&create_type4_8bit($mode, 'square', $bytes);
+	&create_type4_8bit($mode, 'square', $bytes);
 
 
 	#
@@ -181,6 +180,8 @@ sub create_type4_8bit {
 
 	my $im = Image::Magick->new(size=>"${w}x${h}");
 	$im->ReadImage('xc:white');
+	$im->Set(matte => 1);
+	$im->Set(alpha => 'On');
 
 	my $i=0;
 	for my $y(0..$h-1){
@@ -216,6 +217,8 @@ sub create_type6_8bit {
 
 	my $im = Image::Magick->new(size=>"${w}x${h}");
 	$im->ReadImage('xc:white');
+	$im->Set(matte => 1);
+	$im->Set(alpha => 'On');
 
 	my $i=0;
 	for my $y(0..$h-1){
@@ -228,6 +231,9 @@ sub create_type6_8bit {
 		my $color = sprintf('#%02x%02x%02x%02x', $b1, $b2, $b3, $b4);
 
 		$im->Set("pixel[$x,$y]" => $color);
+		#my $check = $im->Get("pixel[$x,$y]");
+		#print "$color -> $check\n";
+		#exit;
 		$i++;
 	}
 	}
