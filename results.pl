@@ -54,12 +54,12 @@ for my $file(sort @files){
 
 	print "\t<tr>\n";
 	print "\t\t<td>$file</td>\n";
-	print "\t\t<td>$w x $h</td>\n";
+	print "\t\t<td align=\"center\">$w x $h</td>\n";
 	print "\t\t<td>Type $type, $depth bit</td>\n";
-	print "\t\t<td align=\"right\"".&colorize($a, $max).">$a</td>\n";
-	print "\t\t<td align=\"right\"".&colorize($b, $max).">$b</td>\n";
-	print "\t\t<td align=\"right\"".&colorize($c, $max).">$c</td>\n";
-	print "\t\t<td align=\"right\"".&colorize($d, $max).">$d</td>\n";
+	print "\t\t<td align=\"right\"".&colorize($a, $max).">".&num($a)."</td>\n";
+	print "\t\t<td align=\"right\"".&colorize($b, $max).">".&num($b)."</td>\n";
+	print "\t\t<td align=\"right\"".&colorize($c, $max).">".&num($c)."</td>\n";
+	print "\t\t<td align=\"right\"".&colorize($d, $max).">".&num($d)."</td>\n";
 
 	if ($max < $gzip){
 		my $saved = $gzip - $max;
@@ -85,4 +85,12 @@ sub colorize {
 	if ($this && $this < $gzip){ return ' style="background-color: #0f0"'; }
 	if ($this && $this <= $max){ return ' style="background-color: #cfc"'; }
 	return '';
+}
+
+sub num {
+	my $s = "$_[0]";
+	if (length $s > 3){
+		return substr($s, 0, length($s)-3).','.substr($s, length($s)-3, 3)
+	}
+	return $s;
 }
